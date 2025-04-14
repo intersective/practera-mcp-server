@@ -1,0 +1,54 @@
+service: practera-mcp-server
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  region: 'us-east-1'
+  memorySize: 1024
+  timeout: 30
+  logRetentionInDays: 14
+  environment:
+    NODE_ENV: production
+    PRACTERA_CLIENT_ID: ${param:practeraClientId, ''}
+    REDIRECT_URI: ${param:redirectUri, ''}
+    ISSUER_URL: ${param:issuerUrl, 'https://auth.practera.com'}
+    BASE_URL: ${param:baseUrl, ''}
+  
+functions:
+  mcp:
+    handler: dist/server.handler
+    events:
+      - httpApi:
+          path: /sse
+          method: ANY
+      - httpApi:
+          path: /messages
+          method: POST
+      - httpApi:
+          path: /oauth/{proxy+}
+          method: any
+      - httpApi:
+          path: /health
+          method: GET
+
+plugins:
+  - serverless-offline
+
+package:
+  patterns:
+    - '!node_modules/.bin/**'
+    - '!src/**'
+    - '!.gitignore'
+    - '!.git/**'
+    - '!*.log'
+    - '!*.md'
+    - 'dist/**'
+    - 'node_modules/**'
+
+custom:
+  serverless-offline:
+    httpPort: 3000
+    noPrependStageInUrl: true 
