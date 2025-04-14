@@ -2,17 +2,22 @@ version: 1.0
 runtime: nodejs18
 build:
   commands:
+    pre-build:
+      - echo "Node version: $(node -v)"
+      - echo "NPM version: $(npm -v)"
     build:
-      - npm install
-      - npm run build
+      - npm ci
+      - tsc
 run:
-  command: npm start
+  command: node dist/server.js
   network:
     port: 80
     env: PORT
   env:
     - name: NODE_ENV
       value: production
+    - name: PORT
+      value: "80"
     # Add other environment variables as needed
     # - name: PRACTERA_CLIENT_ID
     #   value: 'your-client-id'
