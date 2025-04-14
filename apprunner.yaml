@@ -6,7 +6,7 @@ build:
       - npm ci
       - npm run build
 run:
-  command: npm start
+  command: node dist/server.js
   network:
     port: 80
     env: PORT
