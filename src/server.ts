@@ -1,8 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { ProxyOAuthServerProvider } from '@modelcontextprotocol/sdk/server/auth/providers/proxyProvider.js';
-import { mcpAuthRouter } from '@modelcontextprotocol/sdk/server/auth/router.js';
-import getRawBody from "raw-body";
 
 import { GraphQLClient } from 'graphql-request';
 import { z } from 'zod';
