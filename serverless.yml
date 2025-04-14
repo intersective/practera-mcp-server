@@ -16,14 +16,29 @@ provider:
     REDIRECT_URI: ${param:redirectUri, ''}
     ISSUER_URL: ${param:issuerUrl, 'https://auth.practera.com'}
     BASE_URL: ${param:baseUrl, ''}
+    SESSION_TABLE: ${self:service}-${self:provider.stage}-sessions
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:DeleteItem
+        - dynamodb:UpdateItem
+        - dynamodb:Query
+        - dynamodb:Scan
+      Resource:
+        - Fn::GetAtt: [SessionsTable, Arn]
   
 functions:
   mcp:
     handler: dist/server.handler
+    url:
+      invokeMode: RESPONSE_STREAM
+      cors: true
     events:
       - httpApi:
           path: /sse
-          method: ANY
+          method: any
       - httpApi:
           path: /messages
           method: POST
@@ -33,6 +48,23 @@ functions:
       - httpApi:
           path: /health
           method: GET
+
+resources:
+  Resources:
+    SessionsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${self:provider.stage}-sessions
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: sessionId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: sessionId
+            KeyType: HASH
+        TimeToLiveSpecification:
+          AttributeName: ttl
+          Enabled: true
 
 plugins:
   - serverless-offline
