@@ -282,4 +282,9 @@ if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`Practera MCP Server running on http://localhost:${PORT}/sse`);
   });
-} 
+} else {
+  const PORT = process.env.PORT || 80;
+  app.listen(process.env.PORT, () => {
+    console.log(`Practera MCP Server running on http://localhost:${PORT}/sse`);
+  });
+}
