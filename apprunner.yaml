@@ -1,0 +1,20 @@
+version: 1.0
+runtime: nodejs18
+build:
+  commands:
+    build:
+      - npm install
+      - npm run build
+run:
+  command: npm start
+  network:
+    port: 80
+    env: PORT
+  env:
+    - name: NODE_ENV
+      value: production
+    # Add other environment variables as needed
+    # - name: PRACTERA_CLIENT_ID
+    #   value: 'your-client-id'
+    # - name: REDIRECT_URI
+    #   value: 'your-redirect-uri' 
