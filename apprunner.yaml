@@ -4,7 +4,7 @@ build:
   commands:
     build:
       - npm ci
-      - tsc
+      - npm run build
 run:
   command: npm start
   network:
