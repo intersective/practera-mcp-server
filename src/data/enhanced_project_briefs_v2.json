@@ -1,0 +1,122 @@
+[
+  {
+    "id": "pb-001",
+    "title": "Sustainable Urban Development",
+    "description": "Design solutions for sustainable urban development focusing on renewable energy, waste management, and green spaces.",
+    "skills": ["sustainability", "urban planning", "environmental science", "project management", "design thinking"],
+    "complexity": "Medium",
+    "duration": "6 weeks",
+    "teamSize": "3-4 members",
+    "deliverables": ["Research report", "Design mockups", "Implementation plan", "Final presentation"]
+  },
+  {
+    "id": "pb-002",
+    "title": "AI-Powered Healthcare Assistant",
+    "description": "Develop an AI assistant to help healthcare providers track patient symptoms and medical history for more efficient diagnoses.",
+    "skills": ["artificial intelligence", "healthcare", "data science", "machine learning", "software development"],
+    "complexity": "High",
+    "duration": "8 weeks",
+    "teamSize": "4-5 members",
+    "deliverables": ["Functional prototype", "Technical documentation", "User guide", "Presentation"]
+  },
+  {
+    "id": "pb-003",
+    "title": "Financial Literacy for Young Adults",
+    "description": "Create an engaging program to teach financial literacy skills to young adults transitioning to independence.",
+    "skills": ["finance", "education", "curriculum development", "communication", "user research"],
+    "complexity": "Medium",
+    "duration": "5 weeks",
+    "teamSize": "2-3 members",
+    "deliverables": ["Curriculum outline", "Educational materials", "Assessment tools", "Implementation strategy"]
+  },
+  {
+    "id": "pb-004",
+    "title": "Supply Chain Optimization",
+    "description": "Analyze and redesign a company's supply chain to improve efficiency, reduce costs, and minimize environmental impact.",
+    "skills": ["supply chain management", "logistics", "data analysis", "process optimization", "sustainability"],
+    "complexity": "High",
+    "duration": "7 weeks",
+    "teamSize": "3-4 members",
+    "deliverables": ["Analysis report", "Process flow diagrams", "Implementation roadmap", "ROI calculation"]
+  },
+  {
+    "id": "pb-005",
+    "title": "Community Mental Health Awareness",
+    "description": "Develop a community outreach program to increase awareness of mental health resources and reduce stigma.",
+    "skills": ["psychology", "community engagement", "communication", "project management", "research"],
+    "complexity": "Medium",
+    "duration": "6 weeks",
+    "teamSize": "3-4 members",
+    "deliverables": ["Outreach strategy", "Educational materials", "Event plan", "Impact assessment framework"]
+  },
+  {
+    "id": "pb-006",
+    "title": "Digital Marketing Campaign",
+    "description": "Create and execute a digital marketing campaign for a new product launch, targeting specific customer segments.",
+    "skills": ["marketing", "digital media", "content creation", "analytics", "branding"],
+    "complexity": "Medium",
+    "duration": "4 weeks",
+    "teamSize": "2-3 members",
+    "deliverables": ["Marketing strategy", "Campaign assets", "Implementation timeline", "Performance metrics report"]
+  },
+  {
+    "id": "pb-007",
+    "title": "Renewable Energy Microgrid",
+    "description": "Design a renewable energy microgrid system for a remote community with limited access to traditional power sources.",
+    "skills": ["electrical engineering", "renewable energy", "sustainability", "system design", "project management"],
+    "complexity": "High",
+    "duration": "10 weeks",
+    "teamSize": "4-5 members",
+    "deliverables": ["Technical specifications", "System design", "Implementation plan", "Cost analysis"]
+  },
+  {
+    "id": "pb-008",
+    "title": "User Experience Redesign",
+    "description": "Redesign the user experience of an existing web application to improve usability, accessibility, and customer satisfaction.",
+    "skills": ["user experience", "ui design", "accessibility", "web development", "user testing"],
+    "complexity": "Medium",
+    "duration": "6 weeks",
+    "teamSize": "3-4 members",
+    "deliverables": ["User research report", "Wireframes", "Interactive prototype", "Implementation recommendations"]
+  },
+  {
+    "id": "pb-009",
+    "title": "Food Security Initiative",
+    "description": "Develop strategies to improve food security in urban food deserts through community gardens, food distribution, and education.",
+    "skills": ["food systems", "community development", "sustainability", "urban planning", "education"],
+    "complexity": "Medium",
+    "duration": "8 weeks",
+    "teamSize": "3-4 members",
+    "deliverables": ["Needs assessment", "Implementation strategy", "Educational materials", "Sustainability plan"]
+  },
+  {
+    "id": "pb-010",
+    "title": "Cybersecurity Risk Assessment",
+    "description": "Conduct a comprehensive cybersecurity risk assessment for a medium-sized organization and develop mitigation strategies.",
+    "skills": ["cybersecurity", "risk assessment", "network security", "compliance", "technical writing"],
+    "complexity": "High",
+    "duration": "5 weeks",
+    "teamSize": "2-3 members",
+    "deliverables": ["Risk assessment report", "Security recommendations", "Implementation plan", "Training materials"]
+  },
+  {
+    "id": "pb-011",
+    "title": "Inclusive Workplace Development",
+    "description": "Create strategies and programs to foster a more inclusive workplace environment that values diversity and promotes equity.",
+    "skills": ["diversity and inclusion", "human resources", "organizational development", "communication", "training"],
+    "complexity": "Medium",
+    "duration": "7 weeks",
+    "teamSize": "3-4 members",
+    "deliverables": ["Assessment report", "Policy recommendations", "Training program", "Implementation roadmap"]
+  },
+  {
+    "id": "pb-012",
+    "title": "Mobile Health Monitoring App",
+    "description": "Design and prototype a mobile application for personal health monitoring, integrating with wearable devices and providing actionable insights.",
+    "skills": ["mobile development", "healthcare", "UX/UI design", "data analysis", "system integration"],
+    "complexity": "High",
+    "duration": "8 weeks",
+    "teamSize": "3-5 members",
+    "deliverables": ["App prototype", "Technical documentation", "User testing report", "Implementation plan"]
+  }
+] 
