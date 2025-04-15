@@ -2,13 +2,17 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { ProxyOAuthServerProvider } from '@modelcontextprotocol/sdk/server/auth/providers/proxyProvider.js';
 
-import { GraphQLClient } from 'graphql-request';
+import dotenv from 'dotenv';
+import path from 'path';
+import cors from 'cors';
 import { z } from 'zod';
 import express from "express";
 import type { Request, Response } from "express";
-
-import serverless from 'serverless-http';
+import { GraphQLClient } from 'graphql-request';
 import { PracteraAuth } from './auth.js';
+
+// Configure dotenv
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 // Region-specific API endpoints
 const PRACTERA_ENDPOINTS: Record<string, string> = {
@@ -21,10 +25,10 @@ const PRACTERA_ENDPOINTS: Record<string, string> = {
 
 // Create server instance
 const server = new McpServer({
-  name: 'practera-api',
+  name: 'practera-mcp',
   version: '1.0.0',
+  description: 'Designing work-based learning, project learning or other forms of career-connected learning? You can enhance your LLM\'s understanding of world-class experiential learning by connecting to Practera. Practera authors can evaluate and improve their designs in Practera by using our MCP integration.',
   capabilities: {
-    resources: {},
     tools: {}
   }
 });
@@ -86,7 +90,10 @@ function createGraphQLClient(authConfig: any, region: string) {
 
 // Define types for simplified tool registration
 type ToolResult = {
-  content: Array<{type: string, text: string}>;
+  content: Array<{
+    type: "text";
+    text: string;
+  }>;
   isError?: boolean;
 };
 
@@ -96,12 +103,13 @@ server.tool(
   'Get details about a Practera project',
   {
     apikey: z.string().optional().describe('API key for Practera authentication'),
-    region: z.string().describe('Practera region (usa, aus, euk, or stage)'),
+    region: z.string().optional().describe('Practera region (usa, aus, euk, or stage)'),
   },
-  async ({ apikey, region }) => {
+  async (params: { apikey?: string, region?: string }): Promise<ToolResult> => {
     try {
+      const region = params.region || 'usa';
       // Create auth config
-      const authConfig = { apikey };
+      const authConfig = { apikey: params.apikey || '' };
       //console.log('authConfig:', authConfig);
       //  console.log('region:', region);
       const client = createGraphQLClient(authConfig, region);
@@ -148,7 +156,7 @@ server.tool(
             text: JSON.stringify(data, null, 2)
           }
         ]
-      };
+      } as ToolResult;
     } catch (error) {
      //console.error('Error fetching project:');
       return {
@@ -157,8 +165,9 @@ server.tool(
             type: 'text',
             text: `Error fetching project: ${error instanceof Error ? error.message : String(error)}`
           }
-        ]
-      };
+        ],
+        isError: true
+      } as ToolResult;
     }
   }
 );
@@ -169,13 +178,14 @@ server.tool(
   'Get details about a Practera assessment. Note that assessmentId is the ID of the task, not the ID of the activity.',
   {
     apikey: z.string().optional().describe('API key for Practera authentication'),
-    region: z.string().describe('Practera region (usa, aus, euk, or stage)'),
+    region: z.string().optional().describe('Practera region (usa, aus, euk, or stage)'),
     assessmentId: z.string().describe('ID of the assessment to fetch')
   },
-  async ({ apikey, region, assessmentId }) => {
+  async (params: { apikey?: string, region?: string, assessmentId: string }): Promise<ToolResult> => {
     try {
+      const region = params.region || 'usa';
       // Create auth config
-      const authConfig = { apikey };
+      const authConfig = { apikey: params.apikey || '' };
       const client = createGraphQLClient(authConfig, region);
       //console.log('assessmentId:', assessmentId);
       const query = `
@@ -212,7 +222,7 @@ server.tool(
         }
       `;
       
-      const variables = { id: parseInt(assessmentId)};
+      const variables = { id: parseInt(params.assessmentId)};
       const data = await client.request(query, variables);
       //console.error('data:', data);
       return {
@@ -231,13 +241,15 @@ server.tool(
             type: 'text',
             text: `Error fetching assessment: ${error instanceof Error ? error.message : String(error)}`
           }
-        ]
-      };
+        ],
+        isError: true
+      } as ToolResult;
     }
   }
 );
 
-// Register content query tool
+// Apply CORS middleware BEFORE routes
+app.use(cors({ origin: '*' })); // Allow all origins for simplicity, adjust for production
 
 // to support multiple simultaneous connections we have a lookup object from
 // sessionId to transport
@@ -273,18 +285,13 @@ app.get('/health', (req: Request, res: Response) => {
   res.status(200).send('OK');
 });
 
-// Export the server for AWS Lambda
-export const handler = serverless(app);
+// // Export the server for AWS Lambda
+// export const handler = serverless(app);
 
-// For local development
-if (process.env.NODE_ENV !== 'production') {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => {
-    console.log(`Practera MCP Server running on http://localhost:${PORT}/sse`);
-  });
-} else {
-  const PORT = process.env.PORT || 80;
-  app.listen(process.env.PORT, () => {
-    console.log(`Practera MCP Server running on http://localhost:${PORT}/sse`);
-  });
-}
+
+const PORT = process.env.PORT || (process.env.NODE_ENV === 'production' ? 80 : 3000);
+app.listen(PORT, () => {
+  console.log(`MCP Server with Express listening on http://localhost:${PORT}`);
+  console.log(`SSE endpoint: http://localhost:${PORT}/sse`);
+  console.log(`Message endpoint: http://localhost:${PORT}/messages`);
+});
