@@ -9,6 +9,12 @@ import express from "express";
 // Import refactored modules
 import { registerAllTools } from './tools/index.js';
 import { setupRoutes } from './routes.js';
+import { 
+  registerProjectPrompts, 
+  registerAssessmentPrompts, 
+  registerProjectBriefPrompts 
+} from './prompts/index.js';
+import { registerPracteraResources } from './resources/practera-resources.js';
 
 // Configure dotenv
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
@@ -17,7 +23,12 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 const server = new McpServer({
   name: 'practera-mcp',
   version: '1.0.0',
-  description: 'Designing work-based learning, project learning or other forms of career-connected learning? You can enhance your LLM\'s understanding of world-class experiential learning by connecting to Practera. Search for project briefs by skill, analyze existing projects, and get detailed assessment information to create engaging experiential learning experiences.'
+  description: 'Designing work-based learning, project learning or other forms of career-connected learning? You can enhance your LLM\'s understanding of world-class experiential learning by connecting to Practera. Search for project briefs by skill, analyze existing projects, and get detailed assessment information to create engaging experiential learning experiences.',
+  capabilities: {
+    prompts: {},
+    tools: {},
+    resources: {}  // Add resources capability
+  }
 });
 
 // Configure OAuth provider
@@ -50,11 +61,19 @@ const oauthProvider = new ProxyOAuthServerProvider({
 // Register tools with the server
 registerAllTools(server);
 
+// Register prompts with the server
+registerProjectPrompts(server);
+registerAssessmentPrompts(server);
+registerProjectBriefPrompts(server);
+
+// Register resources with the server
+registerPracteraResources(server);
+
 // Initialize Express app for SSE transport
 const app = express();
 
 // Apply CORS middleware BEFORE routes
-app.use(cors({ origin: '*' })); // Allow all origins for simplicity, adjust for production
+// app.use(cors({ origin: '*' })); // Allow all origins for simplicity, adjust for production
 
 // Setup routes
 setupRoutes(app, server);

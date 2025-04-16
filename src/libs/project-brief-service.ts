@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { PROJECT_BRIEFS_PATH } from './data-paths.js';
+import { isSkillMatch } from './search-utils.js';
 
 export interface ProjectBrief {
   project_title: string;
@@ -45,7 +46,7 @@ export class ProjectBriefService {
   }
 
   /**
-   * Search project briefs by skill
+   * Search project briefs by skill using advanced matching techniques
    * @param skill The skill to search for
    * @param limit Maximum number of results to return
    * @returns Array of matching project briefs
@@ -53,23 +54,57 @@ export class ProjectBriefService {
   async searchBySkill(skill: string, limit: number = 5): Promise<ProjectBrief[]> {
     await this.initialize();
     
-    const normalizedSkill = skill.toLowerCase().trim();
+    // Advanced search for exact matches first (using thesaurus, stemming, etc.)
+    const exactMatches = await this.filterBriefsBySkill(this.projectBriefs, skill, true);
     
-    // Find exact matches first
-    const exactMatches = this.projectBriefs.filter(brief => 
-      brief.technical_skills_required.some(s => s.toLowerCase() === normalizedSkill ||
-      brief.professional_skills_required.some(s => s.toLowerCase() === normalizedSkill))
+    // Get remaining briefs (not exact matches)
+    const remainingBriefs = this.projectBriefs.filter(brief => 
+      !exactMatches.includes(brief)
     );
-
-    // Then find partial matches
-    const partialMatches = this.projectBriefs.filter(brief => 
-      !exactMatches.includes(brief) && // Exclude exact matches
-      (brief.technical_skills_required.some(s => s.toLowerCase().includes(normalizedSkill)) ||
-      brief.professional_skills_required.some(s => s.toLowerCase().includes(normalizedSkill)))
-    );
+    
+    // Then look for partial matches
+    const partialMatches = await this.filterBriefsBySkill(remainingBriefs, skill, false);
     
     // Combine results, prioritizing exact matches
     const results = [...exactMatches, ...partialMatches].slice(0, limit);
+    
+    return results;
+  }
+
+  /**
+   * Helper method to filter briefs by skill
+   * @param briefs The list of briefs to filter
+   * @param skill The skill to search for
+   * @param exactMatch Whether to perform exact matching
+   * @returns Filtered array of briefs
+   */
+  private async filterBriefsBySkill(
+    briefs: ProjectBrief[], 
+    skill: string, 
+    exactMatch: boolean
+  ): Promise<ProjectBrief[]> {
+    const results: ProjectBrief[] = [];
+    
+    for (const brief of briefs) {
+      // Check technical skills
+      for (const techSkill of brief.technical_skills_required) {
+        if (await isSkillMatch(techSkill, skill)) {
+          results.push(brief);
+          break; // Found a match, no need to check other skills
+        }
+      }
+      
+      // If already found in technical skills, skip to next brief
+      if (results.includes(brief)) continue;
+      
+      // Check professional skills
+      for (const profSkill of brief.professional_skills_required) {
+        if (await isSkillMatch(profSkill, skill)) {
+          results.push(brief);
+          break; // Found a match, no need to check other skills
+        }
+      }
+    }
     
     return results;
   }

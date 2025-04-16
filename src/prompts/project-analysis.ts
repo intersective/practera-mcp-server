@@ -1,3 +1,6 @@
+import { z } from 'zod';
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+
 export const projectAnalysisSystemPrompt = `
 You are an expert in experiential learning design and assessment, helping analyze Practera projects.
 
@@ -19,19 +22,6 @@ When analyzing project data from the Practera API, consider the following:
    - Look for potential areas where learners might get confused
 
 Please provide specific recommendations for improvement based on best practices in experiential learning.
-`;
-
-export const getProjectPromptTemplate = `
-I need your help analyzing a Practera project structure and learning design. Please use the project data from the API to evaluate the learning design and provide actionable suggestions.
-
-Please analyze:
-1. The overall structure and flow of the project
-2. The assessment strategy and balance
-3. The clarity of instructions and expectations
-4. Any potential improvements to enhance the learning experience
-
-[PROJECT DATA]
-{projectData}
 `;
 
 export const projectAnalysisExampleResponse = `
@@ -56,3 +46,39 @@ The project "Leadership Development Program" has a clear structure with 3 milest
 3. Simplify the language in activities 4 and 7 to improve clarity
 4. Add more peer feedback opportunities in Milestone 3
 `; 
+
+export function registerProjectPrompts(server: McpServer) {
+   server.prompt(
+      "project-analysis",
+      "Analyze a Practera project structure and learning design",
+      { projectData: z.string() },
+      ({ projectData }) => ({
+        messages: [
+         {
+          role: "user",
+          content: {
+            type: "text",
+            text: projectAnalysisSystemPrompt
+          }
+         },
+         {
+          role: "user",
+          content: {
+            type: "text",
+            text: `
+               I need your help analyzing a Practera project structure and learning design. Please use the project data from the API to evaluate the learning design and provide actionable suggestions.
+
+               Please analyze:
+               1. The overall structure and flow of the project
+               2. The assessment strategy and balance
+               3. The clarity of instructions and expectations
+               4. Any potential improvements to enhance the learning experience
+
+               [PROJECT DATA]
+               ${projectData}
+               `
+          }
+        }]
+      })
+    );
+}

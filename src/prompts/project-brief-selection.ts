@@ -1,3 +1,6 @@
+import { z } from 'zod';
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+
 export const projectBriefSearchSystemPrompt = `
 You are an expert in experiential learning and project-based education, helping educators and learners find appropriate project briefs based on skills they want to develop.
 
@@ -72,4 +75,72 @@ Please recommend the most appropriate project briefs from the available options,
 
 [PROJECT BRIEF DATA]
 {projectBriefData}
-`; 
+`;
+
+export function registerProjectBriefPrompts(server: McpServer) {
+  // Register skill-based brief selection prompt
+  server.prompt(
+    "skill-brief-selection",
+    "Find project briefs that help develop specific skills",
+    { 
+      skill: z.string().describe("The skill to search for in project briefs"),
+      projectBriefData: z.string().describe("JSON data containing available project briefs")
+    },
+    ({ skill, projectBriefData }) => ({
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: projectBriefSearchSystemPrompt
+          }
+        },
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: skillBasedBriefSelectionPromptTemplate
+              .replace("{skill}", skill)
+              .replace("{projectBriefData}", projectBriefData)
+          }
+        }
+      ]
+    })
+  );
+
+  // Register complex project brief finder prompt
+  server.prompt(
+    "complex-brief-finder",
+    "Find project briefs matching specific requirements including skills, complexity and timeframe",
+    { 
+      primarySkill: z.string().describe("The primary skill to focus on"),
+      additionalSkills: z.string().describe("Other skills to consider"),
+      complexity: z.string().describe("Desired project complexity level"),
+      timeFrame: z.string().describe("Available time for the project"),
+      projectBriefData: z.string().describe("JSON data containing available project briefs")
+    },
+    ({ primarySkill, additionalSkills, complexity, timeFrame, projectBriefData }) => ({
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: projectBriefSearchSystemPrompt
+          }
+        },
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: complexProjectBriefFinderPromptTemplate
+              .replace("{primarySkill}", primarySkill)
+              .replace("{additionalSkills}", additionalSkills)
+              .replace("{complexity}", complexity)
+              .replace("{timeFrame}", timeFrame)
+              .replace("{projectBriefData}", projectBriefData)
+          }
+        }
+      ]
+    })
+  );
+} 

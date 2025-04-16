@@ -1,3 +1,6 @@
+import { z } from 'zod';
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+
 export const assessmentAnalysisSystemPrompt = `
 You are an expert in assessment design and experiential learning, helping analyze Practera assessments.
 
@@ -62,3 +65,29 @@ This is a team-based submission assessment with 3 question groups focusing on pr
 4. Consider adding a peer feedback component to enhance collaboration
 5. Add clear word/page limits to guide students on expected depth of responses
 `; 
+
+export function registerAssessmentPrompts(server: McpServer) {
+  server.prompt(
+    "assessment-analysis",
+    "Analyze a Practera assessment structure and design",
+    { assessmentData: z.string().describe("JSON data about the assessment structure and questions") },
+    ({ assessmentData }) => ({
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: assessmentAnalysisSystemPrompt
+          }
+        },
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: getAssessmentPromptTemplate.replace("{assessmentData}", assessmentData)
+          }
+        }
+      ]
+    })
+  );
+} 
