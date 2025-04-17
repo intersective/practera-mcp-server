@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node dist/server.js",
     "dev": "NODE_OPTIONS=\"--loader ts-node/esm\" node src/server.ts",
-    "build": "tsc",
+    "build": "tsc && cp -r src/data dist/",
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "serverless deploy"
   },

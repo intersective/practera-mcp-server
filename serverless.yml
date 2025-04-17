@@ -47,6 +47,7 @@ package:
     - '!*.md'
     - 'dist/**'
     - 'node_modules/**'
+    - 'src/data/**'
 
 custom:
   serverless-offline:
