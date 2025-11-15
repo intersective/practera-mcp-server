@@ -38,8 +38,8 @@
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^18.17.0",
     "nodemon": "^3.0.3",
-    "serverless": "^3.38.0",
-    "serverless-offline": "^13.3.2",
+    "serverless": "^4.23.0",
+    "serverless-offline": "^14.4.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   },
