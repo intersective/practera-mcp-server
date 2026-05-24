@@ -24,16 +24,20 @@ import { registerPracteraResources } from './resources/practera-resources.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
-const server = new McpServer({
-  name: 'practera-mcp',
-  version: '1.0.0',
-  description: 'Practera MCP server — access Practera GraphQL API from Cursor agents.',
-  capabilities: {
-    prompts: {},
-    tools: {},
-    resources: {},
+const server = new McpServer(
+  {
+    name: 'practera-mcp',
+    version: '1.0.0',
+    description: 'Practera MCP server — access Practera GraphQL API from Cursor agents.',
+  },
+  {
+    capabilities: {
+      prompts: {},
+      tools: {},
+      resources: {},
+    },
   }
-});
+);
 
 registerAllTools(server);
 registerProjectPrompts(server);

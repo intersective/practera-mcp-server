@@ -20,16 +20,20 @@ import { registerPracteraResources } from './resources/practera-resources.js';
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 // Create server instance
-const server = new McpServer({
-  name: 'practera-mcp',
-  version: '1.0.0',
-  description: 'Designing work-based learning, project learning or other forms of career-connected learning? You can enhance your LLM\'s understanding of world-class experiential learning by connecting to Practera. Search for project briefs by skill, analyze existing projects, and get detailed assessment information to create engaging experiential learning experiences.',
-  capabilities: {
-    prompts: {},
-    tools: {},
-    resources: {}  // Add resources capability
+const server = new McpServer(
+  {
+    name: 'practera-mcp',
+    version: '1.0.0',
+    description: 'Designing work-based learning, project learning or other forms of career-connected learning? You can enhance your LLM\'s understanding of world-class experiential learning by connecting to Practera. Search for project briefs by skill, analyze existing projects, and get detailed assessment information to create engaging experiential learning experiences.',
+  },
+  {
+    capabilities: {
+      prompts: {},
+      tools: {},
+      resources: {},
+    },
   }
-});
+);
 
 // Configure OAuth provider
 const oauthProvider = new ProxyOAuthServerProvider({
