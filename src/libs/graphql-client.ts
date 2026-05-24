@@ -7,7 +7,9 @@ export const PRACTERA_ENDPOINTS: Record<string, string> = {
   aus: 'https://core-graphql-api.aus.practera.com/',
   euk: 'https://core-graphql-api.euk.practera.com/',
   // Stage endpoint for development
-  stage: 'https://core-graphql-api.p2-stage.practera.com/'
+  stage: 'https://core-graphql-api.p2-stage.practera.com/',
+  // Local development endpoint
+  local: process.env.GRAPHQL_URL || 'http://localhost:8000',
 };
 
 /**

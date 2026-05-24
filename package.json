@@ -6,8 +6,11 @@
   "main": "dist/server.js",
   "scripts": {
     "start": "node dist/server.js",
+    "start:stdio": "node dist/stdio.js",
     "dev": "NODE_OPTIONS=\"--loader ts-node/esm\" node src/server.ts",
+    "dev:stdio": "node --loader ts-node/esm src/stdio.ts",
     "build": "tsc && cp -r src/data dist/",
+    "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "serverless deploy"
   },
@@ -32,14 +35,14 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@modelcontextprotocol/inspector": "^0.9.0",
+    "@modelcontextprotocol/inspector": "^0.21.2",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.17",
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^18.17.0",
     "nodemon": "^3.0.3",
-    "serverless": "^3.38.0",
-    "serverless-offline": "^13.3.2",
+    "serverless": "^4.36.1",
+    "serverless-offline": "^14.7.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   },

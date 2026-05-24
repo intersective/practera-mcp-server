@@ -1,137 +1,231 @@
 # Practera MCP Server
 
-An MCP (Model Context Protocol) server that provides access to Practera's GraphQL API, allowing AI models to query Practera learning data.
+An MCP (Model Context Protocol) server that gives AI agents direct access to Practera's GraphQL API and local project brief data. Connect Cursor, Claude Desktop, or any MCP client to author learning programs, manage assessments, submit work as a learner, conduct reviews, and run test suites across the Practera monorepo.
 
 ## Why Practera MCP?
 
-With this MCP server, you can use LLMs to analyze Practera projects and assessments. For now, this is only available to learning designers (author users). 
+With this MCP server, an agent can:
 
-Here are some examples of how you can use this MCP server:
-- Analyze the structure of a project and look for how it can be extended, compressed.
-- Restructure the project for different grade levels or different audiences.
-- Evaluate the assessments in the project and look for how they can be improved.
-- Generate project blueprints and templates.
-- Generate assessments and questions
-- Create a common cartridge version of a project, or import projects from other LMS data files.
+- Analyse and restructure existing projects for different audiences or grade levels
+- Generate assessment blueprints and create questions automatically
+- Import/export programs between institutions or LMS data formats
+- Submit assessments and manage review workflows
+- Search a library of 5400+ experiential learning project briefs by skill
+- Run test suites across all Practera repos directly from Cursor
 
-## Roadmap
+## Quick Start (Cursor — local dev)
 
-[ ] Support metrics API for generating LLM reports
-[ ] Support OAuth 2.1 for secure access
-[ ] Support dynamic creation of assessments, milestones, activities, tasks
-[ ] Support generation of media assets
-[ ] Dynamic resource/tool/prompt selection based on project context
+1. Clone this repo alongside the other Practera repos.
+2. Install dependencies: `npm install`
+3. Add `.cursor/mcp.json` to any Practera repo (see [Cursor Configuration](#cursor-configuration)).
+4. Reload the Cursor MCP panel — the `practera` server will appear.
 
+No separate server process needed. Cursor spawns the MCP server via stdio automatically.
 
-## Features
+## Transports
 
-- Server-Sent Events (SSE) transport for MCP
-- AWS Lambda deployment support
-- GraphQL integration with Practera API
-- Region-specific endpoints
-- API key authentication
-- OAuth 2.1 support for secure access
+### stdio (Cursor local — recommended)
 
-## Prerequisites
+Cursor spawns the server as a subprocess. No separate `npm run dev` needed.
 
-- Node.js 18+
-- npm
-- AWS account (for deployment)
-- Practera API key
-- OAuth client credentials (for OAuth authentication)
-
-## Installation
-
-1. Clone this repository
-2. Install dependencies:
-   ```
-   npm install
-   ```
-
-## Local Development
-
-1. Start the server in development mode:
-   ```
-   npm run dev
-   ```
-2. The server will be available at `http://localhost:3000/sse`
-3. OAuth endpoints will be accessible at `http://localhost:3000/oauth/*`
-
-## Build
-
-To build the project for deployment:
-
-```
-npm run build
+```bash
+# For manual testing / debugging
+npm run dev:stdio
 ```
 
-## Deployment to AWS Lambda
+### SSE (remote / shared)
 
-1. Make sure you have [AWS CLI](https://aws.amazon.com/cli/) installed and configured.
-2. Set up your OAuth configuration parameters:
-   ```
-   export PRACTERA_CLIENT_ID=your_client_id
-   export REDIRECT_URI=your_redirect_uri
-   export ISSUER_URL=your_issuer_url
-   export BASE_URL=your_base_url
-   ```
-3. Deploy using the Serverless Framework:
-   ```
-   npm run deploy -- --param="practeraClientId=$PRACTERA_CLIENT_ID" --param="redirectUri=$REDIRECT_URI" --param="issuerUrl=$ISSUER_URL" --param="baseUrl=$BASE_URL"
-   ```
+An HTTP server with Server-Sent Events — use when multiple clients share one instance.
 
-## Authentication Methods
+```bash
+npm run dev        # → http://localhost:3000/sse
+```
 
-### API Key Authentication
+Connect an MCP client to `http://localhost:3000/sse`.
 
-For simple integration, you can use API key authentication by providing:
-- `apikey` parameter in each tool call
-- `region` parameter to specify the Practera region
+## Cursor Configuration
 
-### OAuth 2.1 Authentication (coming soon)
-
-The server also supports OAuth 2.1 for secure authentication flows:
-
-1. Redirect users to `/oauth/authorize` for authorization
-2. Exchange authorization code for access token at `/oauth/token`
-3. Access the MCP server endpoints using the bearer token
-4. Revoke tokens if needed at `/oauth/revoke`
-
-## Available MCP Tools
-
-This server exposes the following MCP tools:
-
-- `mcp_practera_get_project` - Get details about a Practera project
-- `mcp_practera_get_assessment` - Get details about a Practera assessment
-
-## MCP Client Configuration
-
-When connecting to this MCP server from an MCP client, you'll need to provide:
-
-1. API key for Practera authentication (if using API key auth)
-2. Region for the Practera API (usa, aus, euk or p2-stage)
-3. OAuth configuration (if using OAuth authentication)
-
-### Claude Desktop Configuration Example
+Create `.cursor/mcp.json` in your repo (or add to `~/.cursor/mcp.json` for all workspaces):
 
 ```json
 {
-  "practera": {
-    "url": "https://your-lambda-url.lambda-url.us-east-1.on.aws/mcp"
+  "mcpServers": {
+    "practera": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/practera-mcp-server/dist/stdio.js"
+      ],
+      "env": {
+        "PRACTERA_REGION": "local",
+        "AUTH_EMAIL": "your@email.com",
+        "GRAPHQL_URL": "http://localhost:8000",
+        "WORKSPACE_ROOT": "/absolute/path/to/practera-workspace"
+      }
+    }
   }
 }
 ```
 
-## Example Usage (with Claude)
+> Run `npm run build` in `practera-mcp-server` after any source changes to rebuild `dist/stdio.js`.
 
-You can ask Claude to interact with Practera data using the MCP tools:
+For production regions, omit `AUTH_EMAIL`/`GRAPHQL_URL` and pass `apikey` in each tool call instead.
 
+## Authentication
+
+### API Key (production)
+
+Pass `apikey` in each tool call. The key is forwarded as the `apikey` HTTP header to the GraphQL API.
+
+### devLogin (local/stage only)
+
+Omit `apikey` and set `AUTH_EMAIL` (or pass `email` per tool call). The server calls the `devLogin` GraphQL mutation to obtain a JWT automatically. Only works with `region=local` or `region=stage`.
+
+## Available Tools
+
+### Generic / Read-only
+
+| Tool | Description |
+|------|-------------|
+| `mcp_practera_get_project` | Full project tree: milestones, activities, tasks |
+| `mcp_practera_get_assessment` | Assessment detail with questions and answer choices |
+| `mcp_practera_search_project_briefs` | Search the local brief catalog by skill keyword |
+
+### Author (admin/coordinator role required)
+
+| Tool | GraphQL Operation | Description |
+|------|------------------|-------------|
+| `create_experience` | `createExperience` | Create a new program inside an institution |
+| `create_milestone` | `createMilestone` | Add a milestone to an experience |
+| `create_activity` | `createActivity` | Add an activity to a milestone |
+| `create_assessment` | `createAssessment` | Create an assessment on an activity |
+| `add_question` | `createAssessmentQuestion` | Add a question to an assessment |
+| `add_task_to_activity` | `addTaskToActivity` | Add a task (resource/link) to an activity |
+| `enroll_user` | `enrollUser` | Enroll a user in an experience |
+| `import_experience` | `importExperienceData` | Bulk-import experience content from a JSON export |
+| `export_experience` | `exportExperience` | Export an experience structure as JSON |
+
+### Student (learner)
+
+| Tool | GraphQL Operation | Description |
+|------|------------------|-------------|
+| `list_experiences` | `experiences` | List all experiences for the current user |
+| `get_milestones` | `project.milestones` | Get milestones and activities for a project |
+| `get_tasks` | `tasks(activityId:)` | Get tasks for an activity |
+| `submit_assessment` | `submitAssessment` | Submit an assessment |
+| `get_feedback` | `submission(id:)` | Get submission details including review feedback |
+
+### Reviewer
+
+| Tool | GraphQL Operation | Description |
+|------|------------------|-------------|
+| `list_pending_reviews` | `reviews(status: "pending")` | List assessments awaiting review |
+| `submit_review` | `submitReview` | Submit a completed review |
+
+### Testing
+
+| Tool | Description |
+|------|-------------|
+| `run_tests` | Run a test suite across any Practera repo — shells out to npm/cargo/docker |
+
+#### `run_tests` parameters
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `repo` | Yes | Which repo: `core-graphql-api`, `login-api`, `app-v2`, `practera`, `practera-mcp-server`, `practera-devops-center` |
+| `suite` | Yes | Which suite (see table below) |
+| `pattern` | No | Test file/name filter (passed as `--testPathPattern` for Jest targets) |
+| `workspaceRoot` | No | Absolute path to workspace root. Falls back to `WORKSPACE_ROOT` env var. |
+
+#### Available test suites
+
+| Repo | Suite | Command |
+|------|-------|---------|
+| `core-graphql-api` | `unit` | `npm test` (Jest, with coverage) |
+| `core-graphql-api` | `integration` | `npm run test:integration` |
+| `core-graphql-api` | `parity` | `npm run test:parity` |
+| `login-api` | `unit` | `npx vitest run tests/unit` |
+| `login-api` | `integration` | `npx vitest run tests/integration` |
+| `login-api` | `full` | `npm run test:coverage` |
+| `app-v2` | `unit` | `npm test -- --watch=false` |
+| `practera` | `phpunit` | `docker exec practera-core ./vendor/bin/phpunit` |
+| `practera-mcp-server` | `typecheck` | `npm run typecheck` |
+| `practera-devops-center` | `cargo` | `cargo test` |
+
+## MCP Resources
+
+| Resource URI | Description |
+|-------------|-------------|
+| `practera://project/current` | Current project data (GraphQL) |
+| `practera://assessments/{assessmentId}` | Assessment by ID |
+| `practera://briefs/{briefId}` | Project brief from local catalog |
+
+## MCP Prompts
+
+| Prompt | Purpose |
+|--------|---------|
+| `project-analysis` | Analyse project structure and learning design quality |
+| `assessment-analysis` | Evaluate assessment structure and question quality |
+| `skill-brief-selection` | Find briefs matching a skill from the catalog |
+| `complex-brief-finder` | Match briefs by skill, complexity, and timeframe |
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `PORT` | HTTP port (default 3000 dev / 80 production) |
+| `NODE_ENV` | Environment (`development`, `production`) |
+| `GRAPHQL_URL` | Override local GraphQL endpoint |
+| `PRACTERA_REGION` | Default region: `local`, `stage`, `usa`, `aus`, `euk` |
+| `AUTH_EMAIL` | Default email for devLogin (local/stage) |
+| `WORKSPACE_ROOT` | Absolute path to workspace root — used by `run_tests` |
+
+## GraphQL Regions
+
+| Region | Endpoint |
+|--------|---------|
+| `local` | `http://localhost:8000` (or `GRAPHQL_URL`) |
+| `stage` | `https://core-graphql-api.p2-stage.practera.com/` |
+| `usa` | `https://core-graphql-api.usa.practera.com/` |
+| `aus` | `https://core-graphql-api.aus.practera.com/` |
+| `euk` | `https://core-graphql-api.euk.practera.com/` |
+
+## Build and Deploy
+
+```bash
+# Build
+npm run build       # compiles TS + copies src/data → dist/
+
+# Run SSE server (compiled)
+npm start
+
+# Run stdio (compiled — use in production Cursor config)
+npm run start:stdio
 ```
-Please use the MCP tools to get information about project 123 from Practera.
-```
 
-Claude would then use the `mcp_practera_get_project` tool, providing the API key and region from the configuration.
+### AWS App Runner
+
+The `apprunner.yaml` configures an App Runner service running the SSE server on port 80.
+
+### AWS Lambda (stale)
+
+`serverless.yml` exists but the Lambda handler export is not currently wired up. Use App Runner for production deployment.
+
+## Roadmap
+
+- [x] GraphQL read access (project, assessment)
+- [x] Author CRUD tools (create experience, milestone, activity, assessment, questions, tasks, enroll)
+- [x] Import/export experience JSON
+- [x] Student tools (list, submit, feedback)
+- [x] Reviewer tools (list pending, submit review)
+- [x] Project brief search (5400+ briefs, skill-based)
+- [x] stdio transport for Cursor integration
+- [x] run_tests tool for cross-repo test execution
+- [ ] Metrics API (generate LLM-readable reports from `calculateMetrics`)
+- [ ] OAuth 2.1 (currently scaffolded, not active)
+- [ ] Thread auth context through MCP Resources
+- [ ] `assign_reviewer`, `handle_review` tools for reviewer workflow management
+- [ ] Media asset generation
 
 ## License
 
-MIT License
+MIT
