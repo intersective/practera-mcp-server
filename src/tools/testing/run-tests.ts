@@ -16,64 +16,64 @@ interface TestConfig {
   args: string[];
 }
 
-type RepoKey = 'core-graphql-api' | 'login-api' | 'app-v2' | 'practera' | 'practera-mcp-server' | 'practera-devops-center';
+type RepoKey = 'practera-graphql-api' | 'practera-login-api' | 'practera-app' | 'practera-admin' | 'practera-mcp-server' | 'practera-devops-center';
 type SuiteKey = string;
 
 const TEST_TARGETS: Record<RepoKey, Record<SuiteKey, TestConfig>> = {
-  'core-graphql-api': {
+  'practera-graphql-api': {
     unit: {
       description: 'Jest unit tests (selectProjects unit, with coverage)',
-      cwd: 'core-graphql-api',
+      cwd: 'practera-graphql-api',
       cmd: 'npm',
       args: ['test'],
     },
     integration: {
       description: 'Jest integration tests against real DB (runInBand)',
-      cwd: 'core-graphql-api',
+      cwd: 'practera-graphql-api',
       cmd: 'npm',
       args: ['run', 'test:integration'],
     },
     parity: {
       description: 'CakePHP vs GraphQL parity tests',
-      cwd: 'core-graphql-api',
+      cwd: 'practera-graphql-api',
       cmd: 'npm',
       args: ['run', 'test:parity'],
     },
   },
-  'login-api': {
+  'practera-login-api': {
     unit: {
-      description: 'Vitest unit tests for login-api',
-      cwd: 'login-api',
+      description: 'Vitest unit tests for practera-login-api',
+      cwd: 'practera-login-api',
       cmd: 'npx',
       args: ['vitest', 'run', 'tests/unit', '--reporter=verbose'],
     },
     integration: {
-      description: 'Vitest integration tests for login-api',
-      cwd: 'login-api',
+      description: 'Vitest integration tests for practera-login-api',
+      cwd: 'practera-login-api',
       cmd: 'npx',
       args: ['vitest', 'run', 'tests/integration', '--reporter=verbose'],
     },
     full: {
-      description: 'All login-api tests with coverage',
-      cwd: 'login-api',
+      description: 'All practera-login-api tests with coverage',
+      cwd: 'practera-login-api',
       cmd: 'npm',
       args: ['run', 'test:coverage'],
     },
   },
-  'app-v2': {
+  'practera-app': {
     unit: {
-      description: 'Karma/Jasmine unit tests for app-v2',
-      cwd: 'app-v2',
+      description: 'Karma/Jasmine unit tests for practera-app',
+      cwd: 'practera-app',
       cmd: 'npm',
       args: ['test', '--', '--watch=false', '--browsers=ChromeHeadless'],
     },
   },
-  'practera': {
+  'practera-admin': {
     phpunit: {
-      description: 'PHPUnit tests inside the practera-core Docker container',
+      description: 'PHPUnit tests inside the practera-admin Docker container',
       cwd: '.',
       cmd: 'docker',
-      args: ['exec', 'practera-core', './vendor/bin/phpunit'],
+      args: ['exec', 'practera-admin', './testing/phpunit/run_suite.sh', 'testing/phpunit/Test/Case'],
     },
   },
   'practera-mcp-server': {
