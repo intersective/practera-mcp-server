@@ -28,18 +28,21 @@ import { registerSubmitReviewTool } from './reviewer/submit-review.js';
 // Testing tools
 import { registerRunTestsTool } from './testing/run-tests.js';
 
+// CLI shims (thin wrappers over practera-ops and practera-dev CLIs)
+import { registerOpsShimTool, registerDevShimTool } from './ops-shim.js';
+
 export type { ToolResult } from './get-project.js';
 
 /**
  * Register all tools with the MCP server
  */
 export function registerAllTools(server: McpServer) {
-  // Existing generic tools
+  // Generic / read tools
   registerGetProjectTool(server);
   registerGetAssessmentTool(server);
   registerSearchProjectBriefsTool(server);
 
-  // Author tools
+  // Author tools (designer persona)
   registerCreateExperienceTool(server);
   registerCreateMilestoneTool(server);
   registerCreateActivityTool(server);
@@ -50,17 +53,28 @@ export function registerAllTools(server: McpServer) {
   registerImportExperienceTool(server);
   registerExportExperienceTool(server);
 
-  // Student tools
+  // Learner/QA-sim tools (student + reviewer personas)
+  // Decision (G5): these 7 tools don't map to the 4 primary CLI personas but are
+  // retained as a learner-simulation / QA group. They are useful for:
+  //   - Integration-testing learner flows without a real browser session
+  //   - AI-driven QA simulations (submit assessment, check feedback, submit review)
+  //   - Future learner-facing MCP surface if a student persona is added
+  // NOT folded into practera-dev because they operate on live GraphQL data, not
+  // local tooling. NOT dropped because they have no CLI equivalent yet.
   registerListExperiencesTool(server);
   registerGetMilestonesTool(server);
   registerGetTasksTool(server);
   registerSubmitAssessmentTool(server);
   registerGetFeedbackTool(server);
-
-  // Reviewer tools
   registerListPendingReviewsTool(server);
   registerSubmitReviewTool(server);
 
-  // Testing tools
+  // Testing tools (developer persona — shells to practera-test-suite)
   registerRunTestsTool(server);
+
+  // CLI shims — thin wrappers over practera-ops (ops persona) and practera-dev (developer)
+  // These enable compound commands (scaffold-experience, pm report, etc.) before
+  // each command gets a dedicated tool.
+  registerOpsShimTool(server);
+  registerDevShimTool(server);
 }

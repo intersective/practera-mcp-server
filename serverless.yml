@@ -18,8 +18,12 @@ provider:
     BASE_URL: ${param:baseUrl, ''}
   
 functions:
+  # NOTE: dist/server.handler does NOT exist — server.ts starts an Express process directly.
+  # For Lambda deployment, a serverless-http or @vendia/serverless-express adapter is needed.
+  # Until that adapter is added, deploy this service as a standalone Express process (ECS/EC2/App Runner)
+  # or via the stdio transport only (Cursor local spawn mode).
   mcp:
-    handler: dist/server.handler
+    handler: dist/server.handler  # TODO: wrap with serverless-http before deploying to Lambda
     events:
       - httpApi:
           path: /sse
@@ -27,9 +31,6 @@ functions:
       - httpApi:
           path: /messages
           method: POST
-      - httpApi:
-          path: /oauth/{proxy+}
-          method: any
       - httpApi:
           path: /health
           method: GET

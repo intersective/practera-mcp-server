@@ -1,8 +1,7 @@
 import { z } from 'zod';
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { createGraphQLClient } from '../libs/graphql-client.js';
+import { createAuthenticatedClient } from '../libs/auth-helper.js';
 
-// Define types for tool results
 export type ToolResult = {
   content: Array<{
     type: "text";
@@ -12,22 +11,26 @@ export type ToolResult = {
 };
 
 /**
- * Register project query tool with MCP server
+ * Register project query tool with MCP server.
+ * Supports both apikey (direct) and email/devLogin (local/stage only).
  */
 export function registerGetProjectTool(server: McpServer) {
   server.tool(
     'mcp_practera_get_project',
-    'Get details about a Practera project',
+    'Get the full project tree for the authenticated user — milestones, activities, and tasks.',
     {
-      apikey: z.string().optional().describe('API key for Practera authentication'),
-      region: z.string().optional().describe('Practera region (usa, aus, euk, or stage)'),
+      apikey: z.string().optional().describe('Practera JWT (apikey). Required for production envs; optional if email is set for local/stage.'),
+      email: z.string().optional().describe('Email for devLogin (local/stage only). Omit if apikey is provided.'),
+      region: z.string().optional().describe('Practera region: usa | aus | euk | stage | local'),
     },
-    async (params: { apikey?: string, region?: string }): Promise<ToolResult> => {
+    async (params: { apikey?: string; email?: string; region?: string }): Promise<ToolResult> => {
       try {
-        const region = params.region || 'usa';
-        // Create auth config
-        const authConfig = { apikey: params.apikey || '' };
-        const client = createGraphQLClient(authConfig, region);
+        const client = await createAuthenticatedClient({
+          apikey: params.apikey,
+          email: params.email,
+          region: params.region,
+        });
+
         const query = `
           query project {
             project {
@@ -47,12 +50,12 @@ export function registerGetProjectTool(server: McpServer) {
                   leadImage
                   tasks {
                     id
-                    name 
-                    type 
-                    isLocked 
-                    isTeam 
-                    deadline 
-                    contextId 
+                    name
+                    type
+                    isLocked
+                    isTeam
+                    deadline
+                    contextId
                     assessmentType
                   }
                 }
@@ -60,28 +63,17 @@ export function registerGetProjectTool(server: McpServer) {
             }
           }
         `;
-        
-        const variables = { };
-        const data = await client.request(query, variables);
+
+        const data = await client.request(query);
         return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(data, null, 2)
-            }
-          ]
-        } as ToolResult;
+          content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }],
+        };
       } catch (error) {
         return {
-          content: [
-            {
-              type: "text",
-              text: `Error fetching project: ${error instanceof Error ? error.message : String(error)}`
-            }
-          ],
-          isError: true
-        } as ToolResult;
+          content: [{ type: 'text' as const, text: `Error fetching project: ${error instanceof Error ? error.message : String(error)}` }],
+          isError: true,
+        };
       }
     }
   );
-} 
+}

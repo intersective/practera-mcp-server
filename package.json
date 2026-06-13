@@ -4,9 +4,16 @@
   "description": "MCP server for Practera GraphQL API with OAuth 2.1 support",
   "type": "module",
   "main": "dist/server.js",
+  "bin": {
+    "practera-ops": "./dist/cli/ops/index.js",
+    "practera-dev": "./dist/cli/dev/index.js"
+  },
   "scripts": {
     "start": "node dist/server.js",
     "start:stdio": "node dist/stdio.js",
+    "ops": "node dist/cli/ops/index.js",
+    "dev:ops": "node --loader ts-node/esm src/cli/ops/index.ts",
+    "dev:cli": "node --loader ts-node/esm src/cli/dev/index.ts",
     "dev": "NODE_OPTIONS=\"--loader ts-node/esm\" node src/server.ts",
     "dev:stdio": "node --loader ts-node/esm src/stdio.ts",
     "build": "tsc && cp -r src/data dist/",

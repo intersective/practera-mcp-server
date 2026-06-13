@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { ProxyOAuthServerProvider } from '@modelcontextprotocol/sdk/server/auth/providers/proxyProvider.js';
+// ProxyOAuthServerProvider is scaffolded but not yet wired — see comment below
+// import { ProxyOAuthServerProvider } from '@modelcontextprotocol/sdk/server/auth/providers/proxyProvider.js';
 
 import dotenv from 'dotenv';
 import path from 'path';
@@ -35,32 +36,10 @@ const server = new McpServer(
   }
 );
 
-// Configure OAuth provider
-const oauthProvider = new ProxyOAuthServerProvider({
-  endpoints: {
-    // These would need to be replaced with actual Practera OAuth endpoints
-    authorizationUrl: "https://auth.practera.com/oauth2/v1/authorize",
-    tokenUrl: "https://auth.practera.com/oauth2/v1/token",
-    revocationUrl: "https://auth.practera.com/oauth2/v1/revoke",
-  },
-  verifyAccessToken: async (token) => {
-    // Implement token verification logic here
-    // This is a placeholder implementation
-    return {
-      token,
-      clientId: process.env.PRACTERA_CLIENT_ID || "client_id",
-      scopes: ["api"],
-    };
-  },
-  getClient: async (client_id) => {
-    // Implement client retrieval logic
-    // This is a placeholder implementation
-    return {
-      client_id,
-      redirect_uris: [process.env.REDIRECT_URI || "https://localhost:3000/callback"],
-    };
-  }
-});
+// OAuth provider scaffolded but NOT wired into any route — placeholder only.
+// Do not use until Practera OAuth endpoints are available and the provider
+// is passed to setupRoutes() or applied as middleware.
+// const oauthProvider = new ProxyOAuthServerProvider({ ... });
 
 // Register tools with the server
 registerAllTools(server);

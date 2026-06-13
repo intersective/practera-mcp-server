@@ -131,7 +131,7 @@ Omit `apikey` and set `AUTH_EMAIL` (or pass `email` per tool call). The server c
 
 | Parameter | Required | Description |
 |-----------|----------|-------------|
-| `repo` | Yes | Which repo: `core-graphql-api`, `login-api`, `app-v2`, `practera`, `practera-mcp-server`, `practera-devops-center` |
+| `repo` | Yes | Which repo: `practera-graphql-api`, `practera-login-api`, `practera-app`, `practera-admin`, `practera-mcp-server`, `practera-devops-center` |
 | `suite` | Yes | Which suite (see table below) |
 | `pattern` | No | Test file/name filter (passed as `--testPathPattern` for Jest targets) |
 | `workspaceRoot` | No | Absolute path to workspace root. Falls back to `WORKSPACE_ROOT` env var. |
@@ -140,14 +140,14 @@ Omit `apikey` and set `AUTH_EMAIL` (or pass `email` per tool call). The server c
 
 | Repo | Suite | Command |
 |------|-------|---------|
-| `core-graphql-api` | `unit` | `npm test` (Jest, with coverage) |
-| `core-graphql-api` | `integration` | `npm run test:integration` |
-| `core-graphql-api` | `parity` | `npm run test:parity` |
-| `login-api` | `unit` | `npx vitest run tests/unit` |
-| `login-api` | `integration` | `npx vitest run tests/integration` |
-| `login-api` | `full` | `npm run test:coverage` |
-| `app-v2` | `unit` | `npm test -- --watch=false` |
-| `practera` | `phpunit` | `docker exec practera-core ./vendor/bin/phpunit` |
+| `practera-graphql-api` | `unit` | `npm test` (Jest, with coverage) |
+| `practera-graphql-api` | `integration` | `npm run test:integration` |
+| `practera-graphql-api` | `parity` | `npm run test:parity` |
+| `practera-login-api` | `unit` | `npx vitest run tests/unit` |
+| `practera-login-api` | `integration` | `npx vitest run tests/integration` |
+| `practera-login-api` | `full` | `npm run test:coverage` |
+| `practera-app` | `unit` | `npm test -- --watch=false --browsers=ChromeHeadless` |
+| `practera-admin` | `phpunit` | `docker exec practera-admin ./testing/phpunit/run_suite.sh testing/phpunit/Test/Case` |
 | `practera-mcp-server` | `typecheck` | `npm run typecheck` |
 | `practera-devops-center` | `cargo` | `cargo test` |
 
@@ -206,9 +206,11 @@ npm run start:stdio
 
 The `apprunner.yaml` configures an App Runner service running the SSE server on port 80.
 
-### AWS Lambda (stale)
+### AWS Lambda (not production-ready)
 
-`serverless.yml` exists but the Lambda handler export is not currently wired up. Use App Runner for production deployment.
+`serverless.yml` exists but `dist/server.handler` is not a Lambda handler export — `server.ts` starts
+an Express process directly. Wrap with `serverless-http` before deploying to Lambda. Use App Runner
+for production deployment.
 
 ## Roadmap
 
@@ -221,10 +223,14 @@ The `apprunner.yaml` configures an App Runner service running the SSE server on 
 - [x] stdio transport for Cursor integration
 - [x] run_tests tool for cross-repo test execution
 - [ ] Metrics API (generate LLM-readable reports from `calculateMetrics`)
-- [ ] OAuth 2.1 (currently scaffolded, not active)
-- [ ] Thread auth context through MCP Resources
+- [ ] OAuth 2.1 (provider scaffolded in `server.ts` — not active, not wired)
+- [x] Resources use env-based auth (`PRACTERA_REGION` + `PRACTERA_APIKEY` / `AUTH_EMAIL`)
+- [ ] Per-request auth context in MCP Resources (currently env-only)
 - [ ] `assign_reviewer`, `handle_review` tools for reviewer workflow management
 - [ ] Media asset generation
+- [ ] `practera-ops` CLI integration (G1 — designer/pm/industry compound commands)
+- [ ] `practera-dev` CLI integration (G2 — local tooling, schema introspection)
+- [ ] Persona Skills (G3 — designer / pm / industry / developer)
 
 ## License
 

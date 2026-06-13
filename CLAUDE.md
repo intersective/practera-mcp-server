@@ -28,10 +28,11 @@ practera-mcp-server/
 │   │   ├── get-project.ts     # mcp_practera_get_project
 │   │   ├── get-assessment.ts  # mcp_practera_get_assessment
 │   │   ├── search-project-briefs.ts  # mcp_practera_search_project_briefs
-│   │   ├── author/            # Admin/coordinator tools (9)
-│   │   ├── student/           # Learner tools (5)
-│   │   ├── reviewer/          # Reviewer tools (2)
-│   │   └── testing/           # Test runner tools (1)
+│   │   ├── author/            # Admin/coordinator tools (9) — designer persona
+│   │   ├── student/           # Learner/QA-sim tools (5) — retained, not in any CLI yet
+│   │   ├── reviewer/          # Learner/QA-sim tools (2) — retained, not in any CLI yet
+│   │   ├── ops-shim.ts        # Thin shims: ops_command (practera-ops) + dev_command (practera-dev)
+│   │   └── testing/           # Test runner tools (1) — developer persona
 │   │       └── run-tests.ts   # run_tests
 │   │
 │   ├── resources/
@@ -42,6 +43,16 @@ practera-mcp-server/
 │   │   ├── project-analysis.ts
 │   │   ├── assessment-analysis.ts
 │   │   └── project-brief-selection.ts
+│   │
+│   ├── cli/                    # Agent-native CLIs (printing-press pattern)
+│   │   ├── auth.ts             # Shared CliAuth interface + re-export createAuthenticatedClient
+│   │   ├── ops/                # practera-ops — GraphQL engine for ops personas
+│   │   │   ├── index.ts        # Entry point: designer | pm | industry dispatch
+│   │   │   ├── designer.ts     # designer cmds (list/get/scaffold/export/import experience)
+│   │   │   ├── pm.ts           # pm cmds (report, cohort-summary, assessments-overview)
+│   │   │   └── industry.ts     # industry cmds (search, brief, list — local brief catalog)
+│   │   └── dev/                # practera-dev — local tooling for developers
+│   │       └── index.ts        # test | login | schema | status
 │   │
 │   ├── libs/
 │   │   ├── graphql-client.ts       # PRACTERA_ENDPOINTS + createGraphQLClient
@@ -217,7 +228,16 @@ Both `server.ts` (SSE) and `stdio.ts` call `registerAllTools`, so registering on
 | `import_experience` | `importExperienceData` |
 | `export_experience` | `exportExperience` |
 
-### Student (learner)
+### CLI shims (thin wrappers over practera-ops / practera-dev)
+| Tool | Description |
+|------|-------------|
+| `ops_command` | Run any `practera-ops <group> <command>` — designer, pm, industry compound commands |
+| `dev_command` | Run any `practera-dev <command>` — test, login, schema, status |
+
+### Learner / QA-sim (retained — no CLI equivalent yet)
+These 7 tools simulate learner and reviewer flows. Useful for integration testing and
+future learner-facing MCP surface. Decision: retain in MCP, not folded into CLIs.
+
 | Tool | GraphQL operation |
 |------|------------------|
 | `list_experiences` | `experiences` |
@@ -225,14 +245,10 @@ Both `server.ts` (SSE) and `stdio.ts` call `registerAllTools`, so registering on
 | `get_tasks` | `tasks(activityId:)` |
 | `submit_assessment` | `submitAssessment` |
 | `get_feedback` | `submission(id:)` with reviews |
-
-### Reviewer
-| Tool | GraphQL operation |
-|------|------------------|
 | `list_pending_reviews` | `reviews(status: "pending")` |
 | `submit_review` | `submitReview` |
 
-### Testing
+### Testing (developer persona)
 | Tool | Description |
 |------|-------------|
 | `run_tests` | Run test suites across Practera repos (shells out to npm/cargo/docker) |
@@ -256,12 +272,55 @@ npm start            # SSE transport (dist/server.js)
 npm run start:stdio  # stdio transport (dist/stdio.js)
 ```
 
+## CLI Architecture (Printing-Press Pattern)
+
+The MCP server follows the "printing-press" pattern: agent-native CLIs are the engine,
+MCP tools are thin shims, and Skills provide per-persona muscle memory.
+
+```
+Personas → CLIs → MCP shims
+Designer ──────→ practera-ops designer ... ──→ ops_command MCP tool
+PM ────────────→ practera-ops pm ...      ──→ ops_command MCP tool
+Industry ──────→ practera-ops industry ...──→ ops_command MCP tool
+Developer ─────→ practera-dev ...         ──→ dev_command MCP tool
+                                         ──→ run_tests MCP tool
+```
+
+### `practera-ops` (GraphQL engine)
+
+```bash
+practera-ops designer list-experiences
+practera-ops designer scaffold-experience --name "Program" --milestones 4
+practera-ops pm report 42
+practera-ops pm cohort-summary
+practera-ops industry search "sustainability"
+```
+
+### `practera-dev` (local tooling)
+
+```bash
+practera-dev test integration --env local
+practera-dev login --email dev@practera.com
+practera-dev schema --region local > schema.json
+practera-dev status
+```
+
+### Skills
+
+Cursor Skills live at `~/.cursor/skills/practera-*/SKILL.md`:
+- `practera-designer` → `practera-ops designer`
+- `practera-pm` → `practera-ops pm`
+- `practera-industry` → `practera-ops industry`
+- `practera-developer` → `practera-dev`
+
 ## Important Notes
 
 > The `oauthProvider` in `server.ts` is scaffolded but not wired up — OAuth routes are not active.
 
 > The `PracteraAuth` class in `auth.ts` and `requireAuth` middleware are defined but not used by any tool. Tools perform their own auth via `createAuthenticatedClient`.
 
-> Resources in `practera-resources.ts` hardcode `region = "usa"` — auth context not yet threaded through.
+> Resources in `practera-resources.ts` use env-based auth (`PRACTERA_REGION`, `PRACTERA_APIKEY`, `AUTH_EMAIL`). Region is no longer hardcoded.
 
 > `devLogin` is only available when `NODE_ENV` is `development`/`local` or `ENV=local` on the GraphQL API side.
+
+> `ops_command` and `dev_command` shim tools require `npm run build` to compile the CLI scripts before they can execute. They shell to `dist/cli/ops/index.js` and `dist/cli/dev/index.js` respectively.

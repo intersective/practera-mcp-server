@@ -1,26 +1,30 @@
 import { z } from 'zod';
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { createGraphQLClient } from '../libs/graphql-client.js';
+import { createAuthenticatedClient } from '../libs/auth-helper.js';
 import { ToolResult } from './get-project.js';
 
 /**
- * Register assessment query tool with MCP server
+ * Register assessment query tool with MCP server.
+ * Supports both apikey (direct) and email/devLogin (local/stage only).
  */
 export function registerGetAssessmentTool(server: McpServer) {
   server.tool(
     'mcp_practera_get_assessment',
-    'Get details about a Practera assessment. Note that assessmentId is the ID of the task, not the ID of the activity.',
+    'Get details about a Practera assessment (questions, choices, groups). Note: assessmentId is the task ID, not the activity ID.',
     {
-      apikey: z.string().optional().describe('API key for Practera authentication'),
-      region: z.string().optional().describe('Practera region (usa, aus, euk, or stage)'),
-      assessmentId: z.string().describe('ID of the assessment to fetch')
+      apikey: z.string().optional().describe('Practera JWT (apikey). Required for production envs; optional if email is set for local/stage.'),
+      email: z.string().optional().describe('Email for devLogin (local/stage only). Omit if apikey is provided.'),
+      region: z.string().optional().describe('Practera region: usa | aus | euk | stage | local'),
+      assessmentId: z.string().describe('Task ID of the assessment to fetch'),
     },
-    async (params: { apikey?: string, region?: string, assessmentId: string }): Promise<ToolResult> => {
+    async (params: { apikey?: string; email?: string; region?: string; assessmentId: string }): Promise<ToolResult> => {
       try {
-        const region = params.region || 'usa';
-        // Create auth config
-        const authConfig = { apikey: params.apikey || '' };
-        const client = createGraphQLClient(authConfig, region);
+        const client = await createAuthenticatedClient({
+          apikey: params.apikey,
+          email: params.email,
+          region: params.region,
+        });
+
         const query = `
           query GetAssessment($id: Int!) {
             assessment(id: $id, reviewer: false) {
@@ -54,28 +58,18 @@ export function registerGetAssessmentTool(server: McpServer) {
             }
           }
         `;
-        
-        const variables = { id: parseInt(params.assessmentId)};
+
+        const variables = { id: parseInt(params.assessmentId) };
         const data = await client.request(query, variables);
         return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(data, null, 2)
-            }
-          ]
-        } as ToolResult;
+          content: [{ type: 'text' as const, text: JSON.stringify(data, null, 2) }],
+        };
       } catch (error) {
         return {
-          content: [
-            {
-              type: "text",
-              text: `Error fetching assessment: ${error instanceof Error ? error.message : String(error)}`
-            }
-          ],
-          isError: true
-        } as ToolResult;
+          content: [{ type: 'text' as const, text: `Error fetching assessment: ${error instanceof Error ? error.message : String(error)}` }],
+          isError: true,
+        };
       }
     }
   );
-} 
+}

@@ -1,20 +1,26 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { createGraphQLClient } from "../libs/graphql-client.js";
+import { createAuthenticatedClient } from "../libs/auth-helper.js";
 import { projectBriefService } from "../libs/project-brief-service.js";
 import { ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
-// Define the expected request interface based on MCP spec
-interface ResourceRequest {
-  uri: URL;
-  variables?: Record<string, string>;
-  extra?: {
-    auth?: {
-      apiKey?: string;
-    };
+
+/**
+ * Resolve region and apikey from env for resource handlers.
+ * Resources don't receive per-request params, so we fall back to env vars.
+ * For proper multi-tenant resource auth, prefer the tool surface (which accepts apikey/email params).
+ */
+function getResourceAuth(): { region: string; apikey?: string; email?: string } {
+  return {
+    region: process.env.PRACTERA_REGION ?? "usa",
+    apikey: process.env.PRACTERA_APIKEY || undefined,
+    email: process.env.AUTH_EMAIL || undefined,
   };
 }
 
 /**
  * Registers Practera-specific resources with the MCP server.
+ *
+ * NOTE: Resources use env-based auth (PRACTERA_REGION + PRACTERA_APIKEY / AUTH_EMAIL).
+ * For per-request auth, use the tool surface (tools accept apikey/email params directly).
  */
 export function registerPracteraResources(server: McpServer) {
   // Current Project Resource (static URI)
@@ -22,11 +28,10 @@ export function registerPracteraResources(server: McpServer) {
     "currentProject",
     "practera://project/current",
     async (uri) => {
-      const region = "usa"; // TODO: Get from client context
-      const apikey = ""; // Default empty API key if not provided
+      const auth = getResourceAuth();
 
       try {
-        const client = createGraphQLClient({ apikey }, region);
+        const client = await createAuthenticatedClient(auth);
         const query = `
           query project {
             project { id name milestones { id name description isLocked activities { id name description instructions isLocked leadImage tasks { id name type isLocked isTeam deadline contextId assessmentType } } } }
@@ -60,11 +65,10 @@ export function registerPracteraResources(server: McpServer) {
         throw new Error("Assessment ID is required");
       }
       
-      const region = "usa"; // TODO: Get from client context
-      const apikey = ""; // Default empty API key if not provided
+      const auth = getResourceAuth();
 
       try {
-        const client = createGraphQLClient({ apikey }, region);
+        const client = await createAuthenticatedClient(auth);
         const query = `
           query GetAssessment($id: Int!) {
             assessment(id: $id, reviewer: false) { id name description type dueDate isTeam pulseCheck groups { name description questions { id name description type isRequired hasComment audience fileType choices { id name description explanation } } } }
@@ -124,20 +128,3 @@ export function registerPracteraResources(server: McpServer) {
     }
   );
 }
-
-// Example of what the implementation might look like:
-/*
-server.resource("resourceName", 
-  "resource://uri/pattern",
-  async (request) => {
-    // Fetch data
-    return {
-      contents: [{
-        uri: request.uri.toString(),
-        mimeType: "application/json",
-        text: JSON.stringify(data, null, 2)
-      }]
-    };
-  }
-);
-*/ 
