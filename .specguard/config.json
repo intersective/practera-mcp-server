@@ -1,0 +1,23 @@
+{
+  "apps": [
+    {
+      "name": "mcp-server",
+      "repo": ".",
+      "language": "typescript",
+      "specDir": "specs",
+      "sources": {
+        "api": ["src/tools/**/*.ts", "src/resources/**/*.ts", "src/cli/**/*.ts"],
+        "routes": ["src/server.ts", "src/stdio.ts"],
+        "tests": ["src/**/*.test.ts"]
+      },
+      "framework": "vitest",
+      "testOutput": "src",
+      "docs": "docs/user"
+    }
+  ],
+  "llm": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-5",
+    "apiKeyEnv": "ANTHROPIC_API_KEY"
+  }
+}

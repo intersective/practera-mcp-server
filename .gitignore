@@ -134,3 +134,8 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# SpecGuard local secrets
+.specguard/.env
+.specguard/evidence/
+.specguard/reports/
