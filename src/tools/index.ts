@@ -31,6 +31,9 @@ import { registerRunTestsTool } from './testing/run-tests.js';
 // CLI shims (thin wrappers over practera-ops and practera-dev CLIs)
 import { registerOpsShimTool, registerDevShimTool } from './ops-shim.js';
 
+// Experiential Learning Architect
+import { registerArchitectTools } from './architect/index.js';
+
 export type { ToolResult } from './get-project.js';
 
 /**
@@ -77,4 +80,7 @@ export function registerAllTools(server: McpServer) {
   // each command gets a dedicated tool.
   registerOpsShimTool(server);
   registerDevShimTool(server);
+
+  // Experiential Learning Architect — design state, rules engine, compiler, render tools
+  registerArchitectTools(server);
 }
