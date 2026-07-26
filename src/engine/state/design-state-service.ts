@@ -198,6 +198,14 @@ export class DesignStateService {
     return this.save({ ...design, assessments: [...design.assessments, newAssessment] });
   }
 
+  async updateAssessment(id: string, assessmentId: string, updates: Partial<AssessmentDesign>): Promise<ExperienceDesign> {
+    const design = await this.require(id);
+    return this.save({
+      ...design,
+      assessments: design.assessments.map(a => a.id === assessmentId ? { ...a, ...updates } : a),
+    });
+  }
+
   async addRubric(id: string, rubric: Omit<Rubric, 'id'>): Promise<ExperienceDesign> {
     const design = await this.require(id);
     const newRubric: Rubric = { ...rubric, id: uuidv4() };

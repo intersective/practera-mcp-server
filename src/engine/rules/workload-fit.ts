@@ -5,6 +5,14 @@ import { finding, RuleResult } from './types.js';
 const OVERLOAD_THRESHOLD = 1.25; // 25% over budget triggers warning
 const UNDERLOAD_THRESHOLD = 0.5;  // 50% under budget triggers warning
 
+const SCAFFOLD_MULTIPLIER: Record<string, number> = {
+  modelled: 0.7,
+  guided: 0.9,
+  supported: 1.0,
+  independent: 1.2,
+  transferred: 1.3,
+};
+
 /** Estimated workload must fit the stated duration budget. */
 export function workloadFitRule(design: ExperienceDesign): RuleResult {
   const findings: import("../schema/experience-design.js").QualityFinding[] = [];
@@ -21,8 +29,9 @@ export function workloadFitRule(design: ExperienceDesign): RuleResult {
       maxTotal += activity.estimatedMinutes;
     } else {
       const [min, max] = ACTIVITY_KIND_MINUTES[activity.kind];
-      minTotal += min;
-      maxTotal += max;
+      const mult = SCAFFOLD_MULTIPLIER[activity.scaffoldLevel] ?? 1.0;
+      minTotal += Math.round(min * mult);
+      maxTotal += Math.round(max * mult);
     }
   }
 

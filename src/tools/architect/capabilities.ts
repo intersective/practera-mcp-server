@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { designStateService } from '../../engine/state/design-state-service.js';
-import { v4 as uuidv4 } from 'uuid';
 
 export function registerCapabilitiesTools(server: McpServer) {
   server.tool(
@@ -85,5 +84,4 @@ export function registerCapabilitiesTools(server: McpServer) {
     }
   );
 
-  void uuidv4; // imported but used via service
 }

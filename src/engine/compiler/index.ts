@@ -487,7 +487,7 @@ function buildAssessment(
       question_type: mapQuestionType(q.type),
       is_required: q.required,
       has_comment: false,
-      audience: q.audience === 'submitter' ? 'reviewer' : q.audience === 'reviewer' ? 'reviewer' : 'reviewer',
+      audience: q.audience === 'submitter' ? 'submitter' : q.audience === 'reviewer' ? 'reviewer' : 'submitter,reviewer',
       file_type: null,
       answer: null,
       exemplar: null,

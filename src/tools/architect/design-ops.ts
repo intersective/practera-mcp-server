@@ -327,14 +327,11 @@ export function registerDesignOpsTools(server: McpServer) {
           })),
         });
 
-        // If attached to assessment, update the assessment rubricId
         const rubric = design.rubrics[design.rubrics.length - 1];
         if (rubricData.assessmentId) {
-          const assessment = design.assessments.find(a => a.id === rubricData.assessmentId);
-          if (assessment) {
-            await designStateService.updateActivity(designId, rubricData.assessmentId, {});
-            // Note: assessment update not in state service yet — stored in rubric reference
-          }
+          await designStateService.updateAssessment(designId, rubricData.assessmentId, {
+            rubricId: rubric.id,
+          });
         }
 
         return {
@@ -416,9 +413,17 @@ export function registerDesignOpsTools(server: McpServer) {
     },
     async (params) => {
       try {
+        const existing = await designStateService.get(params.designId);
+        if (!existing) {
+          return { content: [{ type: 'text' as const, text: `Design not found: ${params.designId}` }], isError: true };
+        }
+        const activity = existing.activities.find(a => a.id === params.activityId);
+        const curveballBlock = `\n\n---\n**Curveball: ${params.description}**\n\n${params.rationale ?? ''}`;
+        const updatedInstructions = (activity?.instructions ?? '') + curveballBlock;
+
         const design = await designStateService.updateActivity(params.designId, params.activityId, {
           curveballId: uuidv4(),
-          instructions: `**Curveball: ${params.description}**\n\n${params.rationale ?? ''}`,
+          instructions: updatedInstructions.trim(),
         });
         return {
           content: [{
