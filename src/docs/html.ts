@@ -40,6 +40,7 @@ export const docsHtml = `
     
     <h2>Endpoints</h2>
     <ul>
+      <li><code>/mcp</code> - Streamable HTTP endpoint for the public ChatGPT app</li>
       <li><code>/sse</code> - Server-Sent Events endpoint for establishing MCP connections</li>
       <li><code>/messages</code> - Endpoint for sending messages to established SSE connections</li>
       <li><code>/health</code> - Health check endpoint</li>
@@ -87,8 +88,9 @@ export const docsHtml = `
     
     <h2>Authentication</h2>
     <p>
-      Authentication can be done using an API key or OAuth. When using API keys, pass the key in the tool 
-      parameters. OAuth integration is under development.
+      The public <code>/mcp</code> app surface is anonymous and read-only. It never asks for API keys.
+      The legacy SSE and stdio surfaces support trusted internal development workflows; their production
+      user-specific tools must move to OAuth 2.1 before they are exposed through the public app.
     </p>
     
     <h2>Regions</h2>
@@ -100,4 +102,4 @@ export const docsHtml = `
     </ul>
   </body>
 </html>
-`; 
+`;

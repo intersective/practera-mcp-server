@@ -35,7 +35,24 @@ Cursor spawns the server as a subprocess. No separate `npm run dev` needed.
 npm run dev:stdio
 ```
 
-### SSE (remote / shared)
+### Streamable HTTP (ChatGPT app)
+
+The submission-safe public surface exposes project brief discovery only. It
+does not expose internal CLI tools, Practera credentials, or authenticated
+write operations.
+
+```bash
+npm run build
+npm start
+# MCP endpoint: http://localhost:3000/mcp
+# Health check: http://localhost:3000/health
+# Local widget preview: http://localhost:3000/dev/widget-preview
+```
+
+The public surface implements standard read-only `search` and `fetch` tools,
+plus `render_project_briefs` for the comparison widget.
+
+### SSE (legacy remote / shared)
 
 An HTTP server with Server-Sent Events — use when multiple clients share one instance.
 
@@ -43,7 +60,7 @@ An HTTP server with Server-Sent Events — use when multiple clients share one i
 npm run dev        # → http://localhost:3000/sse
 ```
 
-Connect an MCP client to `http://localhost:3000/sse`.
+Connect a legacy MCP client to `http://localhost:3000/sse`.
 
 ## Cursor Configuration
 
@@ -238,6 +255,9 @@ node dist/cli/dev/index.js test integration --env local
 | `AUTH_EMAIL` | Default email for devLogin (local/stage) |
 | `PRACTERA_APIKEY` | Default API key / JWT (production) |
 | `WORKSPACE_ROOT` | Absolute path to workspace root — used by `run_tests`, `dev_command`, `ops_command` |
+| `PUBLIC_BASE_URL` | Public HTTPS origin used in project brief citation links (local default: `http://localhost:3000`) |
+| `WIDGET_DOMAIN` | Dedicated HTTPS widget origin for submission; defaults to `PUBLIC_BASE_URL` |
+| `OPENAI_APPS_CHALLENGE` | Exact domain-verification token served at `/.well-known/openai-apps-challenge` |
 
 ## GraphQL Regions
 
@@ -262,15 +282,29 @@ npm start
 npm run start:stdio
 ```
 
+### Local ChatGPT testing
+
+1. Run `npm run build && npm start`.
+2. Inspect `http://localhost:3000/mcp` with MCP Inspector using the
+   **Streamable HTTP** transport.
+3. Run `ngrok http 3000` (or another HTTPS tunnel).
+4. In ChatGPT, enable Developer mode under **Settings → Security and login**.
+5. Under **Settings → Plugins**, create a connection using
+   `https://<tunnel-host>/mcp`.
+6. Refresh the connection after changing tools, schemas, annotations, or UI
+   resource metadata.
+
+Use a stable production HTTPS origin—not a tunnel—for submission.
+
 ### AWS App Runner
 
-The `apprunner.yaml` configures an App Runner service running the SSE server on port 80.
+The `apprunner.yaml` configures an App Runner service running the web server on port 80.
 
-### AWS Lambda (not production-ready)
+### AWS Lambda
 
-`serverless.yml` exists but `dist/server.handler` is not a Lambda handler export — `server.ts` starts
-an Express process directly. Wrap with `serverless-http` before deploying to Lambda. Use App Runner
-for production deployment.
+`serverless.yml` uses the `serverless-http` adapter in `dist/handler.handler` and routes the
+HTTP API to the Express app. The ChatGPT `/mcp` route is stateless and returns JSON responses,
+which makes it suitable for Lambda.
 
 ## Roadmap
 
@@ -284,7 +318,7 @@ for production deployment.
 - [x] `practera-ops` CLI + `ops_command` shim (designer / pm / industry personas)
 - [x] `practera-dev` CLI + `dev_command` shim (test / login / schema / status)
 - [ ] Metrics API (generate LLM-readable reports from `calculateMetrics`)
-- [ ] OAuth 2.1 (provider scaffolded in `server.ts` — not active)
+- [ ] OAuth 2.1 for authenticated/public Practera account tools (the current public app is anonymous and read-only)
 - [ ] Per-request auth context in MCP Resources (currently env-only)
 - [ ] `assign_reviewer`, `handle_review` tools for reviewer workflow management
 - [ ] Media asset generation

@@ -1,96 +1,95 @@
 /**
- * MCP Apps Bridge — integrates with the OpenAI Apps SDK communication layer.
+ * Standards-first MCP Apps bridge.
  *
- * Listens for tool results via:
- *   - Standard MCP Apps: postMessage with type 'ui/notifications/tool-result'
- *   - ChatGPT extension: window.openai.toolOutput (feature-detected)
- *
- * Calls tools via:
- *   - Standard MCP Apps: postMessage with type 'tools/call'
- *   - ChatGPT extension: window.openai.callTool (feature-detected)
- *
- * Follows the portability principle: build on the MCP Apps standard;
- * use window.openai only as a progressive enhancement.
+ * New hosts communicate with JSON-RPC over postMessage. ChatGPT's
+ * window.openai globals are used only as an initial-data compatibility path.
  */
 
-export type ToolResultPayload = {
-  toolName: string;
-  result: unknown;
+export type McpToolResult = {
+  structuredContent?: unknown;
+  content?: Array<{ type: string; text?: string }>;
+  _meta?: Record<string, unknown>;
 };
 
-export type ToolCallPayload = {
-  toolName: string;
-  params: Record<string, unknown>;
+export type BridgeListener = (result: McpToolResult) => void;
+
+type PendingRequest = {
+  resolve: (value: unknown) => void;
+  reject: (reason: unknown) => void;
 };
 
-export type BridgeListener = (payload: ToolResultPayload) => void;
+const listeners = new Set<BridgeListener>();
+const pendingRequests = new Map<number, PendingRequest>();
+let nextRequestId = 1;
+let initialized: Promise<void> | null = null;
 
-const listeners = new Map<string, BridgeListener[]>();
-
-/**
- * Register a listener for tool results.
- */
-export function onToolResult(toolName: string, listener: BridgeListener): () => void {
-  if (!listeners.has(toolName)) listeners.set(toolName, []);
-  listeners.get(toolName)!.push(listener);
-
-  return () => {
-    const arr = listeners.get(toolName) ?? [];
-    const idx = arr.indexOf(listener);
-    if (idx !== -1) arr.splice(idx, 1);
-  };
+function notify(method: string, params: Record<string, unknown> = {}): void {
+  window.parent.postMessage({ jsonrpc: '2.0', method, params }, '*');
 }
 
-/**
- * Call an MCP tool from within the widget.
- */
-export async function callTool(toolName: string, params: Record<string, unknown>): Promise<void> {
-  const payload: ToolCallPayload = { toolName, params };
-
-  // ChatGPT-specific path (feature-detected)
-  const openai = (window as unknown as { openai?: { callTool?: (name: string, params: unknown) => Promise<unknown> } }).openai;
-  if (openai?.callTool) {
-    await openai.callTool(toolName, params);
-    return;
-  }
-
-  // Standard MCP Apps path
-  window.parent.postMessage({
-    type: 'tools/call',
-    ...payload,
-  }, '*');
-}
-
-/**
- * Initialise the bridge — wire up incoming messages.
- */
-export function initBridge(): void {
-  window.addEventListener('message', (event) => {
-    const data = event.data;
-    if (!data || typeof data !== 'object') return;
-
-    // Standard MCP Apps: ui/notifications/tool-result
-    if (data.type === 'ui/notifications/tool-result') {
-      const toolName = data.toolName as string;
-      const result = data.result;
-      const listenerArr = listeners.get(toolName) ?? [];
-      for (const listener of listenerArr) {
-        listener({ toolName, result });
-      }
-    }
+function request(method: string, params: Record<string, unknown>): Promise<unknown> {
+  const id = nextRequestId++;
+  window.parent.postMessage({ jsonrpc: '2.0', id, method, params }, '*');
+  return new Promise((resolve, reject) => {
+    pendingRequests.set(id, { resolve, reject });
   });
+}
 
-  // ChatGPT extension: window.openai.toolOutput (progressive)
-  const openai = (window as unknown as { openai?: { toolOutput?: (cb: (name: string, output: unknown) => void) => void } }).openai;
+export function onToolResult(listener: BridgeListener): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function publish(result: McpToolResult): void {
+  for (const listener of listeners) listener(result);
+}
+
+export function initBridge(): Promise<void> {
+  if (initialized) return initialized;
+
+  window.addEventListener('message', (event) => {
+    if (event.source !== window.parent) return;
+    const message = event.data;
+    if (!message || message.jsonrpc !== '2.0') return;
+
+    if (message.id !== undefined && pendingRequests.has(message.id)) {
+      const pending = pendingRequests.get(message.id)!;
+      pendingRequests.delete(message.id);
+      if (message.error) pending.reject(message.error);
+      else pending.resolve(message.result);
+      return;
+    }
+
+    if (message.method === 'ui/notifications/tool-result') {
+      publish(message.params ?? {});
+    }
+  }, { passive: true });
+
+  const openai = (window as Window & {
+    openai?: { toolOutput?: unknown; toolResponseMetadata?: Record<string, unknown> };
+  }).openai;
   if (openai?.toolOutput) {
-    openai.toolOutput((toolName, output) => {
-      const listenerArr = listeners.get(toolName) ?? [];
-      for (const listener of listenerArr) {
-        listener({ toolName, result: output });
-      }
+    publish({
+      structuredContent: openai.toolOutput,
+      _meta: openai.toolResponseMetadata,
     });
   }
 
-  // Signal readiness to the host
-  window.parent.postMessage({ type: 'ui/initialize' }, '*');
+  initialized = request('ui/initialize', {
+    appInfo: { name: 'practera-project-briefs', version: '1.0.0' },
+    appCapabilities: {},
+    protocolVersion: '2026-01-26',
+  }).then(() => {
+    notify('ui/notifications/initialized');
+  });
+
+  return initialized;
+}
+
+export async function callTool(
+  name: string,
+  args: Record<string, unknown>
+): Promise<McpToolResult> {
+  await initBridge();
+  return request('tools/call', { name, arguments: args }) as Promise<McpToolResult>;
 }

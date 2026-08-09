@@ -1,38 +1,44 @@
 import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { initBridge, onToolResult } from './bridge.js';
+import { initBridge, onToolResult, type McpToolResult } from './bridge.js';
 import { ExperienceMap } from './views/ExperienceMap.js';
 import { AlignmentMatrix } from './views/AlignmentMatrix.js';
 import { QualityReport } from './views/QualityReport.js';
+import { ProjectBriefs, type ProjectBriefsData } from './views/ProjectBriefs.js';
 import './styles.css';
 
-type View = 'experience_map' | 'alignment_matrix' | 'quality_report' | 'idle';
+type View = 'project_briefs' | 'experience_map' | 'alignment_matrix' | 'quality_report' | 'idle';
 
 function App() {
   const [view, setView] = useState<View>('idle');
   const [data, setData] = useState<unknown>(null);
 
   useEffect(() => {
-    initBridge();
-
-    const tools = ['render_experience_map', 'render_alignment_matrix', 'render_quality_report'];
-    const cleanups = tools.map(tool =>
-      onToolResult(tool, (payload) => {
-        const result = payload.result as { content?: Array<{ text: string }> };
-        if (result?.content?.[0]?.text) {
-          try {
-            const parsed = JSON.parse(result.content[0].text);
-            setData(parsed);
-            setView(parsed.view as View ?? 'idle');
-          } catch {
-            // ignore parse errors
-          }
+    const applyResult = (result: McpToolResult) => {
+      let nextData = result.structuredContent;
+      if (!nextData && result.content?.[0]?.text) {
+        try {
+          nextData = JSON.parse(result.content[0].text);
+        } catch {
+          return;
         }
-      })
-    );
+      }
 
-    return () => cleanups.forEach(c => c());
+      if (!nextData || typeof nextData !== 'object') return;
+      const nextView = (nextData as { view?: View }).view;
+      if (!nextView) return;
+      setData(nextData);
+      setView(nextView);
+    };
+
+    const cleanup = onToolResult(applyResult);
+    void initBridge();
+    return cleanup;
   }, []);
+
+  if (view === 'project_briefs' && data) {
+    return <ProjectBriefs data={data as ProjectBriefsData} />;
+  }
 
   if (view === 'experience_map' && data) {
     return <ExperienceMap data={data as Parameters<typeof ExperienceMap>[0]['data']} />;

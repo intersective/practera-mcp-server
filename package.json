@@ -16,7 +16,10 @@
     "dev:cli": "node --loader ts-node/esm src/cli/dev/index.ts",
     "dev": "NODE_OPTIONS=\"--loader ts-node/esm\" node src/server.ts",
     "dev:stdio": "node --loader ts-node/esm src/stdio.ts",
-    "build": "tsc && cp -r src/data dist/",
+    "build": "npm --prefix packages/widget run build && tsc && cp -r src/data dist/",
+    "build:server": "tsc && cp -r src/data dist/",
+    "check": "npm run typecheck && npm --prefix packages/widget run typecheck",
+    "test:chatgpt": "node scripts/test-chatgpt-mcp.mjs",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
     "deploy": "serverless deploy"

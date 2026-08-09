@@ -118,7 +118,20 @@ export class ProjectBriefService {
     await this.initialize();
     return this.projectBriefs.slice(0, limit);
   }
+
+  getBriefId(brief: ProjectBrief): string {
+    return brief.project_title
+      .normalize('NFKD')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  async getBriefById(id: string): Promise<ProjectBrief | undefined> {
+    await this.initialize();
+    return this.projectBriefs.find((brief) => this.getBriefId(brief) === id);
+  }
 }
 
 // Export singleton instance
-export const projectBriefService = new ProjectBriefService(); 
+export const projectBriefService = new ProjectBriefService();
