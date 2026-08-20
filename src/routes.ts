@@ -1,10 +1,29 @@
-import { Express, Request, Response } from 'express';
+import { Express, Request, Response, NextFunction } from 'express';
 import { homepageHtml, docsHtml } from './docs/html.js';
 import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 // Central store for transports
 const transports: {[sessionId: string]: SSEServerTransport} = {};
+
+/**
+ * Middleware that requires a valid MCP_SHARED_SECRET bearer token.
+ * If MCP_SHARED_SECRET is not set, access is allowed (local dev mode).
+ * This guards /sse, /messages, and /mcp against unauthenticated access in production.
+ */
+function mcpAuth(req: Request, res: Response, next: NextFunction): void {
+  const secret = process.env.MCP_SHARED_SECRET;
+  if (!secret) {
+    // No secret configured — allow all connections (local dev / SSE stdio mode).
+    return next();
+  }
+  const authHeader = (req.headers['authorization'] as string | undefined) || '';
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+  if (token === secret) {
+    return next();
+  }
+  res.status(401).json({ error: 'Unauthorized' });
+}
 
 export const setupRoutes = (app: Express, server: McpServer) => {
   // Root endpoint - welcome page
@@ -18,7 +37,7 @@ export const setupRoutes = (app: Express, server: McpServer) => {
   });
 
   // SSE endpoint for MCP
-  app.get("/sse", async (_: Request, res: Response) => {
+  app.get("/sse", mcpAuth, async (_: Request, res: Response) => {
     const transport = new SSEServerTransport('/messages', res);
     transports[transport.sessionId] = transport;
     res.on("close", () => {
@@ -28,7 +47,7 @@ export const setupRoutes = (app: Express, server: McpServer) => {
   });
 
   // Message endpoint for MCP
-  app.post("/messages", async (req: Request, res: Response) => {
+  app.post("/messages", mcpAuth, async (req: Request, res: Response) => {
     const sessionId = req.query.sessionId as string;
     const transport = transports[sessionId];
     if (transport) {
