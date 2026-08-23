@@ -18,11 +18,17 @@ import { registerExportExperienceTool } from './author/export-experience.js';
 import { registerListExperiencesTool } from './student/list-experiences.js';
 import { registerGetMilestonesTool } from './student/get-milestones.js';
 import { registerGetTasksTool } from './student/get-tasks.js';
+import { registerGetOrCreateSubmissionTool } from './student/get-or-create-submission.js';
+import { registerSaveSubmissionAnswerTool } from './student/save-submission-answer.js';
 import { registerSubmitAssessmentTool } from './student/submit-assessment.js';
+import { registerStartActivityTool } from './student/start-activity.js';
 import { registerGetFeedbackTool } from './student/get-feedback.js';
 
 // Reviewer tools
 import { registerListPendingReviewsTool } from './reviewer/list-pending-reviews.js';
+import { registerAssignReviewerTool } from './reviewer/assign-reviewer.js';
+import { registerSaveReviewAnswerTool } from './reviewer/save-review-answer.js';
+import { registerCompleteReviewTool } from './reviewer/complete-review.js';
 import { registerSubmitReviewTool } from './reviewer/submit-review.js';
 
 // Testing tools
@@ -54,11 +60,17 @@ export function registerAllTools(server: McpServer) {
   registerListExperiencesTool(server);
   registerGetMilestonesTool(server);
   registerGetTasksTool(server);
+  registerGetOrCreateSubmissionTool(server);
+  registerSaveSubmissionAnswerTool(server);
   registerSubmitAssessmentTool(server);
+  registerStartActivityTool(server);
   registerGetFeedbackTool(server);
 
   // Reviewer tools
   registerListPendingReviewsTool(server);
+  registerAssignReviewerTool(server);
+  registerSaveReviewAnswerTool(server);
+  registerCompleteReviewTool(server);
   registerSubmitReviewTool(server);
 
   // Testing tools
