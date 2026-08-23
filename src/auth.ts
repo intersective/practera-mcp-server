@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken';
+import { decodeJwt } from 'jose';
 import type { Request, Response, NextFunction } from 'express';
 
 interface AuthConfig {
@@ -36,7 +36,7 @@ export class PracteraAuth {
     this.appkey = config.appkey || '';
     
     if (typeof config.apikey === 'string') {
-      const decoded = jwt.decode(config.apikey) as any;
+      const decoded = decodeJwt(config.apikey) as any;
       this.timelineId = decoded.timeline_id || null;
       this.role = decoded.role || 'none';
     }
@@ -81,18 +81,15 @@ export class PracteraAuth {
       // This is a placeholder - in a real implementation, you would verify
       // the token with the issuer or use a library specific to your OAuth provider
       
-      // For JWT tokens, you might do something like:
-      const decoded = jwt.decode(token);
+      const decoded = decodeJwt(token);
       
       if (!decoded) {
         throw new Error('Invalid token format');
       }
       
       // Check token expiration
-      if (typeof decoded === 'object') {
-        if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
-          throw new Error('Token expired');
-        }
+      if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
+        throw new Error('Token expired');
       }
       return decoded as Record<string, any>;
     } catch (error) {
@@ -111,21 +108,18 @@ export class PracteraAuth {
       // This is a placeholder - in a real implementation, you would verify
       // the token with the issuer or use a library specific to your OAuth provider
       
-      // For JWT tokens, you might do something like:
-      const decoded = jwt.decode(apikey);
+      const decoded = decodeJwt(apikey);
       
       if (!decoded) {
         throw new Error('Invalid token format');
       }
       
       // Check token expiration
-      if (typeof decoded === 'object') {
-        if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
-          throw new Error('Token expired');
-        }
-        if (role && decoded.role !== role) {
-          throw new Error('Unauthorized');
-        }
+      if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
+        throw new Error('Token expired');
+      }
+      if (role && (decoded as any).role !== role) {
+        throw new Error('Unauthorized');
       }
       return decoded as Record<string, any>;
     } catch (error) {
