@@ -11,9 +11,10 @@ export function registerSaveReviewAnswerTool(server: McpServer) {
       email: z.string().optional(),
       region: z.string().optional(),
       reviewId: z.number().describe('ID of the review assignment.'),
+      submissionId: z.number().optional().describe('ID of the submission being reviewed (required when creating an answer for the first time).'),
       questionId: z.number().describe('ID of the review question being answered.'),
       answer: z.string().nullable().optional().describe('Text answer or comment.'),
-      choiceId: z.number().optional().describe('Choice ID for rating/scale questions.'),
+      comment: z.string().optional().describe('Reviewer comment for this answer.'),
     },
     async (params) => {
       try {
@@ -23,25 +24,18 @@ export function registerSaveReviewAnswerTool(server: McpServer) {
           region: params.region,
         });
         const mutation = `
-          mutation SaveReviewAnswer(
-            $reviewId: Int!
-            $questionId: Int!
-            $answer: String
-            $choiceId: Int
-          ) {
-            saveReviewAnswer(
-              reviewId: $reviewId
-              questionId: $questionId
-              answer: $answer
-              choiceId: $choiceId
-            ) { id }
+          mutation SaveReviewAnswer($input: SaveReviewAnswerInput!) {
+            saveReviewAnswer(input: $input) { success message }
           }
         `;
         const data: any = await client.request(mutation, {
-          reviewId: params.reviewId,
-          questionId: params.questionId,
-          answer: params.answer ?? null,
-          choiceId: params.choiceId,
+          input: {
+            reviewId: params.reviewId,
+            submissionId: params.submissionId,
+            questionId: params.questionId,
+            answer: params.answer ?? null,
+            comment: params.comment,
+          },
         });
         return {
           content: [{

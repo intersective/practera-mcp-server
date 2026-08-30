@@ -1,0 +1,46 @@
+{
+  "apps": [
+    {
+      "name": "app",
+      "repo": ".",
+      "language": "typescript",
+      "specDir": "specs",
+      "sources": {
+        "routes": [
+          "src/**/*.{ts,tsx,js,jsx}"
+        ],
+        "api": [
+          "src/api/**/*.{ts,js}"
+        ],
+        "tests": [
+          "tests/**/*.test.{ts,js}"
+        ]
+      },
+      "framework": "vitest",
+      "testOutput": "tests/",
+      "security": {
+        "enabled": false
+      },
+      "docs": false
+    }
+  ],
+  "runners": {
+    "playwright": "local",
+    "semgrep": "auto",
+    "bandit": "auto",
+    "testRunner": "local"
+  },
+  "llm": {
+    "provider": "anthropic",
+    "model": "claude-sonnet-4-6",
+    "apiKeyEnv": "ANTHROPIC_API_KEY"
+  },
+  "heal": {
+    "maxRetries": 2,
+    "testCommand": "npm test"
+  },
+  "matrix": {
+    "format": "json",
+    "output": ".specguard/traceability.json"
+  }
+}

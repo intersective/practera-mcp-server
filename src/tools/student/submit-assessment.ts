@@ -32,25 +32,17 @@ export function registerSubmitAssessmentTool(server: McpServer) {
           region: params.region,
         });
         const mutation = `
-          mutation SubmitAssessment(
-            $submissionId: Int!
-            $assessmentId: Int!
-            $contextId: Int!
-            $answers: [SubmissionAnswerInput]
-          ) {
-            submitAssessment(
-              submissionId: $submissionId
-              assessmentId: $assessmentId
-              contextId: $contextId
-              answers: $answers
-            ) { id status }
+          mutation SubmitAssessment($input: SubmitAssessmentInput!) {
+            submitAssessment(input: $input) { success message }
           }
         `;
         const data: any = await client.request(mutation, {
-          submissionId: params.submissionId,
-          assessmentId: params.assessmentId,
-          contextId: params.contextId,
-          answers: params.answers,
+          input: {
+            submissionId: params.submissionId,
+            assessmentId: params.assessmentId,
+            contextId: params.contextId,
+            answers: params.answers,
+          },
         });
         return {
           content: [{ type: 'text' as const, text: JSON.stringify(data.submitAssessment, null, 2) }],

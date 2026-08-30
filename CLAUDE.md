@@ -265,3 +265,28 @@ npm run start:stdio  # stdio transport (dist/stdio.js)
 > Resources in `practera-resources.ts` hardcode `region = "usa"` — auth context not yet threaded through.
 
 > `devLogin` is only available when `NODE_ENV` is `development`/`local` or `ENV=local` on the GraphQL API side.
+
+<!-- specguard:specguard-workflow:start -->
+## SpecGuard
+
+This project uses SpecGuard for spec-driven QA (language: **typescript**).
+Specs in `specs/` are the source of truth — read a module's spec before editing it.
+
+After changing code, run `specguard gap-analysis`, `specguard status`, and
+`specguard drift`. Tests run with `npm test`. Run `/goal` to build
+the whole project from its specs.
+<!-- specguard:specguard-workflow:end -->
+
+<!-- specguard:specguard-commands:start -->
+| Command | What it does |
+|---------|-------------|
+| `specguard analyze` | Smart diagnostics — start here when unsure |
+| `specguard gap-analysis` | Find unimplemented specs and generate build plans |
+| `specguard status` | Spec + test coverage report |
+| `specguard reverse --all` | Generate Living Specs from source |
+| `specguard generate --all` | Generate test files from specs |
+| `specguard heal --all` | Run tests and auto-fix test bugs |
+| `specguard drift` | Detect specs out of sync with code |
+| `specguard security --all` | OWASP security test stubs |
+| (tests run via) | `npm test` |
+<!-- specguard:specguard-commands:end -->
