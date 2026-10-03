@@ -33,6 +33,7 @@ import { registerSubmitReviewTool } from './reviewer/submit-review.js';
 
 // Testing tools
 import { registerRunTestsTool } from './testing/run-tests.js';
+import { registerActivityTools } from './activity/actions.js';
 
 export type { ToolResult } from './get-project.js';
 
@@ -75,4 +76,7 @@ export function registerAllTools(server: McpServer) {
 
   // Testing tools
   registerRunTestsTool(server);
+
+  // Learner and reviewer activity tools shared with the simulation CLI
+  registerActivityTools(server);
 }
