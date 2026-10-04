@@ -72,8 +72,18 @@ registerPracteraResources(server);
 // Initialize Express app for SSE transport
 const app = express();
 
-// Apply CORS middleware BEFORE routes
-// app.use(cors({ origin: '*' })); // Allow all origins for simplicity, adjust for production
+const adminOrigins = (process.env.ADMIN_APP_ORIGINS
+  || 'http://localhost:4400,https://admin.practera.local,http://admin.practera.local')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || adminOrigins.includes(origin)) callback(null, true);
+    else callback(null, false);
+  },
+}));
 
 // Setup routes
 setupRoutes(app, server);

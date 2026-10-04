@@ -18,6 +18,11 @@ This module registers all HTTP routes for the Express application, including pub
 - AC-8: `POST /messages` with a valid bearer token and a known `sessionId` query parameter delegates to the matching transport's `handlePostMessage`.
 - AC-9: `POST /messages` with a valid bearer token and an unknown or missing `sessionId` responds with HTTP 400 and the body `No transport found for sessionId`.
 - AC-10: When `MCP_SHARED_SECRET` is not set, `GET /sse` and `POST /messages` are accessible without any `Authorization` header.
+- AC-11: `GET /tools` returns HTTP 200 and `{ tools }` where each tool has `name`, `description`, and `inputSchema`, and `apikey` and `email` are omitted from that schema.
+- AC-12: `POST /tools/call` with a known tool name and arguments runs that tool and returns its result. `express.json()` is applied only on this route.
+- AC-13: `GET /tools` and `POST /tools/call` respond with HTTP 401 and `{ "error": "Unauthorized" }` when `MCP_SHARED_SECRET` is set and the bearer token does not match.
+- AC-14: When `MCP_SHARED_SECRET` is not set, `GET /tools` and `POST /tools/call` are accessible without an `Authorization` header.
+- AC-15: The SSE server allows CORS from the admin app origins (`ADMIN_APP_ORIGINS`, defaulting to `http://localhost:4400`, `https://admin.practera.local`, and `http://admin.practera.local`).
 
 ## Scenarios
 
@@ -140,6 +145,31 @@ This module registers all HTTP routes for the Express application, including pub
 **Expected Results:**
 - `GET /sse` does not return `401`; the SSE handshake proceeds (status `200`).
 - `POST /messages` does not return `401`; it proceeds to transport lookup (returns `400` only if session is unknown, not `401`).
+
+---
+
+### Scenario 11: Tool catalog omits the API key and calls a tool
+
+**Steps:**
+1. Leave `MCP_SHARED_SECRET` unset.
+2. Send `GET /tools`.
+3. Send `POST /tools/call` with a known tool name and arguments.
+
+**Expected Results:**
+- `GET /tools` is `200` and no tool schema contains `apikey` or `email`.
+- `POST /tools/call` is `200` and returns the tool result.
+
+---
+
+### Scenario 12: Tool routes reject a bad bearer token
+
+**Steps:**
+1. Set `MCP_SHARED_SECRET`.
+2. Send `GET /tools` and `POST /tools/call` with no bearer token, then with the matching bearer token.
+
+**Expected Results:**
+- The unauthenticated calls are `401` with `{ "error": "Unauthorized" }`.
+- The matching bearer token is `200`.
 
 ## Security Notes
 
