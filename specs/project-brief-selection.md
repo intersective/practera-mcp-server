@@ -1,6 +1,6 @@
 # Project Brief Selection Prompts
 
-<!-- module: app/project-brief-selection / type: feature / status: draft -->
+<!-- module: app/project-brief-selection / type: feature / status: draft / feature: source.library.mcp-prompts-->
 
 ## Overview
 

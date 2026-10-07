@@ -1,6 +1,6 @@
 # Create Milestone Tool
 
-<!-- module: app/author/create-milestone / type: tool / status: draft -->
+<!-- module: app/author/create-milestone / type: tool / status: draft / feature: design.structure.milestone-crud-->
 
 ## Overview
 

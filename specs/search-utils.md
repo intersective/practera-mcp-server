@@ -1,6 +1,6 @@
 # Search Utilities
 
-<!-- module: app/search-utils / type: utility-library / status: draft -->
+<!-- module: app/search-utils / type: utility-library / status: draft / feature: source.library.mcp-search-->
 
 ## Overview
 

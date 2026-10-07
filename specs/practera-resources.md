@@ -1,6 +1,6 @@
 # Practera MCP Resources
 
-<!-- module: app/practera-resources / type: feature / status: draft -->
+<!-- module: app/practera-resources / type: feature / status: draft / feature: source.library.mcp-resources-->
 
 ## Overview
 

@@ -1,6 +1,6 @@
 # Submit Assessment Tool
 
-<!-- module: app/student/submit-assessment / type: tool / status: draft -->
+<!-- module: app/student/submit-assessment / type: tool / status: draft / feature: deliver.submit.shell-->
 
 ## Overview
 

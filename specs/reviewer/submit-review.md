@@ -1,6 +1,6 @@
 # Submit Review Tool
 
-<!-- module: app/reviewer/submit-review / type: tool / status: draft -->
+<!-- module: app/reviewer/submit-review / type: tool / status: draft / feature: deliver.review.reviewer-queue-->
 
 ## Overview
 

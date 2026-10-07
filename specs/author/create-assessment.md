@@ -1,6 +1,6 @@
 # Create Assessment Tool
 
-<!-- module: app/author/create-assessment / type: tool / status: draft -->
+<!-- module: app/author/create-assessment / type: tool / status: draft / feature: design.assessment.builder-->
 
 ## Overview
 

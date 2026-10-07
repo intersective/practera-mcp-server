@@ -1,6 +1,6 @@
 # Export Experience Tool
 
-<!-- module: app/author/export-experience / type: tool / status: draft -->
+<!-- module: app/author/export-experience / type: tool / status: draft / feature: design.experience.export-template-->
 
 ## Overview
 

@@ -1,6 +1,6 @@
 # Search Project Briefs Tool
 
-<!-- module: app/search-project-briefs / type: mcp-tool / status: draft -->
+<!-- module: app/search-project-briefs / type: mcp-tool / status: draft / feature: source.library.mcp-search-->
 
 ## Overview
 

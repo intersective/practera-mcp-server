@@ -1,6 +1,6 @@
 # Save Review Answer Tool
 
-<!-- module: app/reviewer/save-review-answer / type: tool / status: draft -->
+<!-- module: app/reviewer/save-review-answer / type: tool / status: draft / feature: deliver.review.reviewer-queue-->
 
 ## Overview
 

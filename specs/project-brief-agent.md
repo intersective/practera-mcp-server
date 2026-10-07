@@ -1,6 +1,6 @@
 # Project Brief Agent
 
-<!-- module: app/project-brief-agent / type: agent / status: draft -->
+<!-- module: app/project-brief-agent / type: agent / status: draft / feature: source.ai.brief-agent-->
 
 ## Overview
 

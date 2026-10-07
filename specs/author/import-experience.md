@@ -1,6 +1,6 @@
 # Import Experience Tool
 
-<!-- module: app/author/import-experience / type: tool / status: draft -->
+<!-- module: app/author/import-experience / type: tool / status: draft / feature: design.experience.import-json-->
 
 ## Overview
 

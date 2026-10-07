@@ -1,6 +1,6 @@
 # List Experiences Tool
 
-<!-- module: app/student/list-experiences / type: tool / status: draft -->
+<!-- module: app/student/list-experiences / type: tool / status: draft / feature: deliver.learner.experience-switcher-->
 
 ## Overview
 

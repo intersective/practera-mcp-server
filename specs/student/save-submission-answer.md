@@ -1,6 +1,6 @@
 # Save Submission Answer Tool
 
-<!-- module: app/student/save-submission-answer / type: tool / status: draft -->
+<!-- module: app/student/save-submission-answer / type: tool / status: draft / feature: deliver.submit.shell-->
 
 ## Overview
 

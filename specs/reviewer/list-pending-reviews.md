@@ -1,6 +1,6 @@
 # List Pending Reviews Tool
 
-<!-- module: app/reviewer/list-pending-reviews / type: tool / status: draft -->
+<!-- module: app/reviewer/list-pending-reviews / type: tool / status: draft / feature: deliver.review.reviewer-queue-->
 
 ## Overview
 

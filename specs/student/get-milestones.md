@@ -1,6 +1,6 @@
 # Get Milestones Tool
 
-<!-- module: app/student/get-milestones / type: tool / status: draft -->
+<!-- module: app/student/get-milestones / type: tool / status: draft / feature: deliver.learner.milestones-->
 
 ## Overview
 

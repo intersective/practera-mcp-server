@@ -1,6 +1,6 @@
 # Get Tasks Tool
 
-<!-- module: app/student/get-tasks / type: tool / status: draft -->
+<!-- module: app/student/get-tasks / type: tool / status: draft / feature: deliver.learner.activity-->
 
 ## Overview
 

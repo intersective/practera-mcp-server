@@ -1,6 +1,6 @@
 # Create Experience Tool
 
-<!-- module: app/author/create-experience / type: tool / status: draft -->
+<!-- module: app/author/create-experience / type: tool / status: draft / feature: design.experience.create-scratch, inst.portfolio.create -->
 
 ## Overview
 

@@ -1,6 +1,6 @@
 # Start Activity Tool
 
-<!-- module: app/student/start-activity / type: tool / status: draft -->
+<!-- module: app/student/start-activity / type: tool / status: draft / feature: deliver.learner.activity-->
 
 ## Overview
 

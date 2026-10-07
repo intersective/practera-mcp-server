@@ -1,6 +1,6 @@
 # Complete Review Tool
 
-<!-- module: app/reviewer/complete-review / type: tool / status: draft -->
+<!-- module: app/reviewer/complete-review / type: tool / status: draft / feature: deliver.review.reviewer-queue-->
 
 ## Overview
 

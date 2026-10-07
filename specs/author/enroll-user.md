@@ -1,6 +1,6 @@
 # Enroll User Tool
 
-<!-- module: app/author/enroll-user / type: tool / status: draft -->
+<!-- module: app/author/enroll-user / type: tool / status: draft / feature: source.enrol.single-user-->
 
 ## Overview
 

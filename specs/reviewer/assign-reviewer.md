@@ -1,6 +1,6 @@
 # Assign Reviewer Tool
 
-<!-- module: app/reviewer/assign-reviewer / type: tool / status: draft -->
+<!-- module: app/reviewer/assign-reviewer / type: tool / status: draft / feature: deliver.feedback.assign-reviewers-->
 
 ## Overview
 

@@ -1,6 +1,6 @@
 # Add Task to Activity Tool
 
-<!-- module: app/author/add-task / type: tool / status: draft -->
+<!-- module: app/author/add-task / type: tool / status: draft / feature: design.structure.task-add-->
 
 ## Overview
 

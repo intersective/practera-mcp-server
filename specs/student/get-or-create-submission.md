@@ -1,6 +1,6 @@
 # Get or Create Submission Tool
 
-<!-- module: app/student/get-or-create-submission / type: tool / status: draft -->
+<!-- module: app/student/get-or-create-submission / type: tool / status: draft / feature: deliver.submit.shell-->
 
 ## Overview
 

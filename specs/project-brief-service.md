@@ -1,6 +1,6 @@
 # Project Brief Service
 
-<!-- module: app/project-brief-service / type: service / status: draft -->
+<!-- module: app/project-brief-service / type: service / status: draft / feature: source.library.mcp-search-->
 
 ## Overview
 
