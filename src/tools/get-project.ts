@@ -1,3 +1,4 @@
+import { registerTool } from '../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createGraphQLClient } from '../libs/graphql-client.js';
@@ -15,7 +16,7 @@ export type ToolResult = {
  * Register project query tool with MCP server
  */
 export function registerGetProjectTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'mcp_practera_get_project',
     'Get details about a Practera project',
     {

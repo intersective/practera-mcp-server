@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerCreateAssessmentTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'create_assessment',
     'Create an assessment inside an experience. Requires admin or coordinator role.',
     {

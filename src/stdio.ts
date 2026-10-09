@@ -28,11 +28,6 @@ const server = new McpServer({
   name: 'practera-mcp',
   version: '1.0.0',
   description: 'Practera MCP server — access Practera GraphQL API from Cursor agents.',
-  capabilities: {
-    prompts: {},
-    tools: {},
-    resources: {},
-  }
 });
 
 registerAllTools(server);

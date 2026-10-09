@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerSaveSubmissionAnswerTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'save_submission_answer',
     'Save a single answer to an in-progress submission. Call get_or_create_submission first to obtain the submissionId. Call submit_assessment when all answers are saved.',
     {

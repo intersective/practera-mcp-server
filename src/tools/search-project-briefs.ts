@@ -1,3 +1,4 @@
+import { registerTool } from '../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { projectBriefService, ProjectBrief } from '../libs/project-brief-service.js';
@@ -112,7 +113,7 @@ async function searchBriefsBySkill(skill: string, limit: number = 5): Promise<Pr
  * Register project brief search tool with MCP server
  */
 export function registerSearchProjectBriefsTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'mcp_practera_search_project_briefs',
     'Search for project briefs that match a specific skill',
     {

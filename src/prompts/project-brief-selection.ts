@@ -1,3 +1,4 @@
+import { registerPrompt } from '../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
@@ -79,7 +80,7 @@ Please recommend the most appropriate project briefs from the available options,
 
 export function registerProjectBriefPrompts(server: McpServer) {
   // Register skill-based brief selection prompt
-  server.prompt(
+  registerPrompt(server, 
     "skill-brief-selection",
     "Find project briefs that help develop specific skills",
     { 
@@ -109,7 +110,7 @@ export function registerProjectBriefPrompts(server: McpServer) {
   );
 
   // Register complex project brief finder prompt
-  server.prompt(
+  registerPrompt(server, 
     "complex-brief-finder",
     "Find project briefs matching specific requirements including skills, complexity and timeframe",
     { 

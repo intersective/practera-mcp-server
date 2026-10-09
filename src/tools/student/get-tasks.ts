@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerGetTasksTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'get_tasks',
     'Get all tasks (assessments and topics) inside a specific activity.',
     {

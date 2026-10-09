@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerSaveReviewAnswerTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'save_review_answer',
     'Save a reviewer\'s answer to a single review question. Call list_pending_reviews to find the reviewId, then save each answer before calling complete_review.',
     {

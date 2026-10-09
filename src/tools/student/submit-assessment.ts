@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerSubmitAssessmentTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'submit_assessment',
     'Submit an assessment finalising all answers. Requires the submissionId from get_or_create_submission, the assessmentId, and the contextId. Optionally pass inline answers to save and submit in one step.',
     {

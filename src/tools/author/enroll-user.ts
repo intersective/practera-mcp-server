@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerEnrollUserTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'enroll_user',
     'Enroll a user into an experience with a given role. Requires admin or coordinator role.',
     {

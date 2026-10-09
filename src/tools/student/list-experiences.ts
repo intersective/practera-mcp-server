@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerListExperiencesTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'list_experiences',
     'List all experiences the authenticated user is enrolled in.',
     {

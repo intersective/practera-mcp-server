@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerStartActivityTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'start_activity',
     'Mark an activity as started for the authenticated learner. This creates a progress record so the activity appears as "in progress" on the learner\'s task list.',
     {

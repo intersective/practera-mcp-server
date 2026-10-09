@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerImportExperienceTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'import_experience',
     'Bulk-import experience content (milestones, activities, assessments) from a JSON export into an existing experience. Requires admin role or local environment.',
     {

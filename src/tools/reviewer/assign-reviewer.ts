@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerAssignReviewerTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'assign_reviewer',
     'Assign a reviewer to a submitted assessment. Use reviewerType "expert" for mentors/coordinators or "peer" for fellow learners. Optionally specify a reviewerId to assign a specific person; otherwise the system selects automatically.',
     {

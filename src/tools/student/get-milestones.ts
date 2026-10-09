@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerGetMilestonesTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'get_milestones',
     'Get all milestones and their activities for the current user\'s enrolled project.',
     {

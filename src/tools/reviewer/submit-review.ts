@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerSubmitReviewTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'submit_review',
     'Submit a completed review for an assessment submission.',
     {

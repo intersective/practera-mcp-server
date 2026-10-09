@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerAddQuestionTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'add_question',
     'Add a question to an existing assessment. Requires admin or coordinator role.',
     {

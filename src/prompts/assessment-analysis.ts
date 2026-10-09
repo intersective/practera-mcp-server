@@ -1,3 +1,4 @@
+import { registerPrompt } from '../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
@@ -67,7 +68,7 @@ This is a team-based submission assessment with 3 question groups focusing on pr
 `; 
 
 export function registerAssessmentPrompts(server: McpServer) {
-  server.prompt(
+  registerPrompt(server, 
     "assessment-analysis",
     "Analyze a Practera assessment structure and design",
     { assessmentData: z.string().describe("JSON data about the assessment structure and questions") },

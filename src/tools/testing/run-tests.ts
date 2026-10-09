@@ -1,3 +1,4 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { spawn } from 'child_process';
@@ -148,7 +149,7 @@ export function registerRunTestsTool(server: McpServer) {
     .map(([repo, suites]) => `${repo}: ${Object.keys(suites).join(', ')}`)
     .join(' | ');
 
-  server.tool(
+  registerTool(server, 
     'run_tests',
     `Run a Practera project test suite from within Cursor. Shells out to npm/cargo/docker. Available targets — ${suiteDescription}`,
     {

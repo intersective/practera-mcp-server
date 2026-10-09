@@ -1,3 +1,4 @@
+import { registerTool } from '../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { createGraphQLClient } from '../libs/graphql-client.js';
@@ -7,7 +8,7 @@ import { ToolResult } from './get-project.js';
  * Register assessment query tool with MCP server
  */
 export function registerGetAssessmentTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'mcp_practera_get_assessment',
     'Get details about a Practera assessment. Note that assessmentId is the ID of the task, not the ID of the activity.',
     {

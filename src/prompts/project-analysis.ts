@@ -1,3 +1,4 @@
+import { registerPrompt } from '../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
@@ -48,7 +49,7 @@ The project "Leadership Development Program" has a clear structure with 3 milest
 `; 
 
 export function registerProjectPrompts(server: McpServer) {
-   server.prompt(
+   registerPrompt(server, 
       "project-analysis",
       "Analyze a Practera project structure and learning design",
       { projectData: z.string() },

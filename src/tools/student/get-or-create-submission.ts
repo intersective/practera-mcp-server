@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerGetOrCreateSubmissionTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'get_or_create_submission',
     'Query an assessment\'s submissions for a given context. The GraphQL API automatically creates a new in-progress submission if none exists. Returns the submissionId needed for save_submission_answer and submit_assessment.',
     {

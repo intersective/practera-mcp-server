@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerCreateMilestoneTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'create_milestone',
     'Create a milestone (stage) inside a project. Requires admin or coordinator role.',
     {

@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerGetFeedbackTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'get_feedback',
     'Get review feedback for a specific assessment submission.',
     {

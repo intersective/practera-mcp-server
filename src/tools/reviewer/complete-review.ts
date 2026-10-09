@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerCompleteReviewTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'complete_review',
     'Finalise a review, marking it as done and making feedback visible to the learner. Optionally pass inline answers to save and submit in one step.',
     {

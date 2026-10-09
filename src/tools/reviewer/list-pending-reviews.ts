@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerListPendingReviewsTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'list_pending_reviews',
     'List all assessment submissions pending review for the authenticated reviewer.',
     {

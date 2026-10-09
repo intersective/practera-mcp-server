@@ -1,9 +1,10 @@
+import { registerTool } from '../../libs/register-tool.js';
 import { z } from 'zod';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { createAuthenticatedClient } from '../../libs/auth-helper.js';
 
 export function registerAddTaskTool(server: McpServer) {
-  server.tool(
+  registerTool(server, 
     'add_task_to_activity',
     'Add a task (assessment or topic) to an activity sequence. Requires admin or coordinator role.',
     {
