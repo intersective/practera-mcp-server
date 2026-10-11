@@ -40,7 +40,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/node": "^22.0.0",
-    "serverless": "^4.36.1",
+    "serverless": "npm:osls@^4.4.0",
     "serverless-offline": "^14.7.0",
     "tsx": "^4.22.4",
     "typescript": "^5.9.3"
